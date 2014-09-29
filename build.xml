@@ -1,0 +1,31 @@
+<project name="algo" basedir="." default="main">
+	<property name="src.dir"	value="src" />
+	<property name="build.dir"	value="build" />
+	<property name="classes.dir"	value="${build.dir}/classes" />
+	<property name="docs.dir"	value="docs" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="build">
+		<mkdir dir="${classes.dir}" />
+		<javac 	srcdir="${src.dir}" debug="true" destdir="${classes.dir}" includeantruntime="false" />
+	</target>
+
+	<target name="run" depends="build">
+		<java classname="de.algo.Main" fork="true">
+			<classpath>
+				<pathelement location="${classes.dir}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="document">
+		<javadoc sourcepath="${src.dir}" destdir="${docs.dir}" />
+	</target>
+
+	<target name="cleandocs">
+		<delete dir="${docs.dir}" />
+	</target>
+</project>
