@@ -1,4 +1,4 @@
-<project name="algo" basedir="." default="main">
+<project name="algo" basedir="." default="run">
 	<property name="src.dir"	value="src" />
 	<property name="build.dir"	value="build" />
 	<property name="classes.dir"	value="${build.dir}/classes" />
@@ -10,7 +10,9 @@
 
 	<target name="build">
 		<mkdir dir="${classes.dir}" />
-		<javac 	srcdir="${src.dir}" debug="true" destdir="${classes.dir}" includeantruntime="false" />
+		<javac 	srcdir="${src.dir}" debug="true" destdir="${classes.dir}" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked" />
+		</javac>
 	</target>
 
 	<target name="run" depends="build">
