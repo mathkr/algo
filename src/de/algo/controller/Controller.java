@@ -22,30 +22,58 @@ package de.algo.controller;
 import de.algo.view.*;
 import de.algo.util.*;
 
-import java.awt.event.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Controller {
         private View view;
 
-        public Controller(View view) {
-                this.view = view;
-
-                initView();
+        public Controller() {
+                view = new View(this);
         }
 
-        private void initView() {
-                view.MAIN_FRAME.addWindowListener(new WindowAdapter() {
-                        @Override
-                        public void windowClosing(WindowEvent e) {
-                                exit();
-                        }
-                });
-
-                view.MAIN_FRAME.setVisible(true);
-        }
-
-        private void exit() {
-                Logger.log(Logger.INFO, "Exiting...");
+        public void exit() {
+                Logger.log(Logger.INFO, "Exiting.");
                 System.exit(0);
+        }
+
+        public void processSelectedFiles(File[] selected) {
+                Logger.log(Logger.DEBUG, "Attempting to load files.");
+
+                List<File> files = new ArrayList<>(Arrays.asList(selected));
+                List<File> directoryFiles = files
+                        .stream()
+                        .filter(File::isDirectory)
+                        .map(File::listFiles)
+                        .map(Arrays::stream)
+                        .flatMap(Function.<Stream<File>>identity())
+                        .collect(Collectors.toList());
+
+                files.addAll(directoryFiles);
+
+                files = files
+                        .parallelStream()
+                        .filter(f -> isValidFile(f))
+                        .map(f -> {
+                                Logger.log(Logger.DEBUG, "Loading " + f.getPath());
+                                return f;
+                        })
+                        .collect(Collectors.toList());
+
+                if (files.isEmpty()) {
+                        Logger.log(Logger.INFO, "No image files found.");
+                }
+        }
+
+        private boolean isValidFile(File file) {
+                return  file != null &&
+                        file.isFile() &&
+                        file.canRead() &&
+                        view.FILEFILTER.accept(file);
         }
 }

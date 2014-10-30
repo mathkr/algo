@@ -19,10 +19,60 @@
 
 package de.algo.view;
 
-public class View {
-        public final MainFrame MAIN_FRAME;
+import de.algo.controller.*;
 
-        public View() {
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.event.*;
+import java.io.File;
+
+public class View {
+        private final Controller CONTROLLER;
+
+        public final MainFrame MAIN_FRAME;
+        public final JFileChooser FILECHOOSER;
+        public final FileNameExtensionFilter FILEFILTER;
+
+        public View(Controller controller) {
+                CONTROLLER = controller;
+
                 MAIN_FRAME = new MainFrame();
+
+                FILECHOOSER = new JFileChooser(".");
+                FILECHOOSER.setMultiSelectionEnabled(true);
+                FILECHOOSER.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                FILEFILTER = new FileNameExtensionFilter("JPG and GIF Images", "jpg", "jpeg", "gif");
+                FILECHOOSER.setFileFilter(FILEFILTER);
+
+                addListeners();
+
+                MAIN_FRAME.setVisible(true);
+        }
+
+        private void addListeners() {
+                MAIN_FRAME.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosing(WindowEvent e) {
+                                CONTROLLER.exit();
+                        }
+                });
+
+                MAIN_FRAME.MENUITEM_EXIT.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                                CONTROLLER.exit();
+                        }
+                });
+
+                MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                                final int result = FILECHOOSER.showOpenDialog(MAIN_FRAME);
+                                if (result == JFileChooser.APPROVE_OPTION) {
+                                        File[] files = FILECHOOSER.getSelectedFiles();
+                                        CONTROLLER.processSelectedFiles(files);
+                                }
+                        }
+                });
         }
 }

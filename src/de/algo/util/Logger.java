@@ -20,20 +20,46 @@
 package de.algo.util;
 
 public class Logger {
-        public final static int DEBUG = 3;
-        public final static int INFO = 2;
-        public final static int WARNING = 1;
         public final static int ERROR = 0;
+        public final static int WARNING = 1;
+        public final static int INFO = 2;
+        public final static int DEBUG = 3;
 
-        private static int logLevel = DEBUG;
+        private final static String[] PREFIXES = {
+                "ERR ",
+                "WARN",
+                "INFO",
+                "DEBG"
+        };
+
+        private static int maximumLogLevel = DEBUG;
+        private static boolean printPrefix = true;
 
         public static void setMaximumLogLevel(int level) {
-                logLevel = level;
+                maximumLogLevel = level;
+        }
+
+        public static void setPrintPrefix(boolean printPrefix) {
+                Logger.printPrefix = printPrefix;
+        }
+
+        public static int getMaximumLogLevel() {
+                return maximumLogLevel;
+        }
+
+        public static boolean getPrintPrefix() {
+                return printPrefix;
         }
 
         public static void log(int level, String msg) {
-                if (level <= logLevel) {
-                        System.out.println(msg);
+                if (level <= maximumLogLevel) {
+                        String[] lines = msg.split("\n");
+                        for (int i = 0; i < lines.length; ++i) {
+                                if (printPrefix) {
+                                        System.out.print(PREFIXES[level] + ": ");
+                                }
+                                System.out.println(lines[i]);
+                        }
                 }
         }
 }

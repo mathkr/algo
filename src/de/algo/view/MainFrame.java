@@ -20,17 +20,39 @@
 package de.algo.view;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.*;
 
 public class MainFrame extends JFrame {
+        public final JPanel CANVAS;
+        public final JPanel GALLERY;
+
         public final JSplitPane SPLITPANE;
+
+        public final JMenuBar MENUBAR;
+        public final JMenu MENU_FILE;
+        public final JMenuItem MENUITEM_OPENIMG;
+        public final JMenuItem MENUITEM_EXIT;
 
         public MainFrame() {
                 super();
-                init();
-        }
+                setLayout(new BorderLayout());
 
-        private void init() {
-                SPLITPANE = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, null, null);
+                CANVAS = new JPanel();
+                GALLERY = new JPanel();
+
+                SPLITPANE = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, CANVAS, GALLERY);
+                SPLITPANE.setOneTouchExpandable(true);
+                SPLITPANE.setResizeWeight(1.0);
+                add(SPLITPANE, BorderLayout.CENTER);
+
+                MENUBAR = new JMenuBar();
+                MENU_FILE = new JMenu("Datei");
+                MENUITEM_OPENIMG = new JMenuItem("Bilder oeffnen..");
+                MENUITEM_EXIT = new JMenuItem("Beenden");
+
+                MENU_FILE.add(MENUITEM_OPENIMG);
+                MENU_FILE.add(MENUITEM_EXIT);
+                MENUBAR.add(MENU_FILE);
+                setJMenuBar(MENUBAR);
         }
 }
