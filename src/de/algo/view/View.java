@@ -19,33 +19,43 @@
 
 package de.algo.view;
 
-import de.algo.controller.*;
+import de.algo.controller.Controller;
+import de.algo.model.Model;
+import de.algo.util.Logger;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
 
-public class View {
-        private final Controller CONTROLLER;
+public class View implements Observer {
+        private Controller controller;
+        private Model model;
+
+        private JFileChooser fileChooser;
 
         public final MainFrame MAIN_FRAME;
-        public final JFileChooser FILECHOOSER;
         public final FileNameExtensionFilter FILEFILTER;
 
-        public View(Controller controller) {
-                CONTROLLER = controller;
+        public View(Model model, Controller controller) {
+                this.controller = controller;
+                this.model = model;
+                model.addObserver(this);
 
                 MAIN_FRAME = new MainFrame();
 
-                FILECHOOSER = new JFileChooser(".");
-                FILECHOOSER.setMultiSelectionEnabled(true);
-                FILECHOOSER.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 FILEFILTER = new FileNameExtensionFilter("JPG and GIF Images", "jpg", "jpeg", "gif");
-                FILECHOOSER.setFileFilter(FILEFILTER);
+                fileChooser = new JFileChooser(".");
+                fileChooser.setMultiSelectionEnabled(true);
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fileChooser.setFileFilter(FILEFILTER);
 
                 addListeners();
 
+                MAIN_FRAME.pack();
                 MAIN_FRAME.setVisible(true);
         }
 
@@ -53,26 +63,40 @@ public class View {
                 MAIN_FRAME.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosing(WindowEvent e) {
-                                CONTROLLER.exit();
+                                controller.exit();
                         }
                 });
 
-                MAIN_FRAME.MENUITEM_EXIT.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                                CONTROLLER.exit();
+                MAIN_FRAME.MENUITEM_EXIT.addActionListener(event -> controller.exit());
+
+                MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(event -> {
+                        final int result = fileChooser.showOpenDialog(MAIN_FRAME);
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                                File[] files = fileChooser.getSelectedFiles();
+                                controller.processSelectedFiles(files);
                         }
                 });
+        }
 
-                MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                                final int result = FILECHOOSER.showOpenDialog(MAIN_FRAME);
-                                if (result == JFileChooser.APPROVE_OPTION) {
-                                        File[] files = FILECHOOSER.getSelectedFiles();
-                                        CONTROLLER.processSelectedFiles(files);
+        @Override
+        public void update(Observable o, Object arg) {
+                Logger.log(Logger.DEBUG, "Model updated.");
+                MAIN_FRAME.repaint();
+        }
+
+        public void updateGallery() {
+                MAIN_FRAME.GALLERY.removeAll();
+                model.loadedImages.forEach((identifier, image) -> {
+                        GalleryTilePanel panel = new GalleryTilePanel(identifier, image);
+                        panel.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mouseClicked(MouseEvent e) {
+                                        Logger.log(Logger.DEBUG, identifier + " clicked in gallery.");
                                 }
-                        }
+                        });
+                        MAIN_FRAME.GALLERY.add(panel);
                 });
+                MAIN_FRAME.GALLERY.setPreferredSize(new Dimension(300, model.loadedImages.size() * 300));
+                MAIN_FRAME.revalidate();
         }
 }

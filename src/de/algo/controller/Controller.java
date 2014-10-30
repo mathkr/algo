@@ -19,22 +19,27 @@
 
 package de.algo.controller;
 
-import de.algo.view.*;
-import de.algo.util.*;
+import de.algo.model.Model;
+import de.algo.util.Logger;
+import de.algo.util.Timer;
+import de.algo.view.View;
 
+import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Controller {
         private View view;
+        private Model model;
 
-        public Controller() {
-                view = new View(this);
+        public Controller(Model model) {
+                this.model = model;
+                view = new View(model, this);
         }
 
         public void exit() {
@@ -57,7 +62,7 @@ public class Controller {
                 files.addAll(directoryFiles);
 
                 files = files
-                        .parallelStream()
+                        .stream()
                         .filter(f -> isValidFile(f))
                         .map(f -> {
                                 Logger.log(Logger.DEBUG, "Loading " + f.getPath());
@@ -67,7 +72,45 @@ public class Controller {
 
                 if (files.isEmpty()) {
                         Logger.log(Logger.INFO, "No image files found.");
+                } else {
+                        Map<String, Image> imageMap = loadImages(files);
+                        model.addImages(imageMap);
+                        view.updateGallery();
                 }
+        }
+
+        private Map<String, Image> loadImages(List<File> files) {
+                Toolkit toolkit = view.MAIN_FRAME.getToolkit();
+                MediaTracker mediaTracker = new MediaTracker(view.MAIN_FRAME);
+                Map<String, Image> images = new HashMap<>();
+                int trackerID = 0;
+
+                Timer timer = new Timer();
+                timer.start();
+
+                for (File file : files) {
+                        Image image = toolkit.createImage(file.getPath());
+                        mediaTracker.addImage(image, trackerID++);
+                        images.put(file.getPath(), image);
+                }
+
+                try {
+                        mediaTracker.waitForAll();
+                        timer.stop();
+                        double totalFileSize = files
+                                .stream()
+                                .map(File::length)
+                                .reduce(0L, (acc, s) -> acc + s) / (1024.0 * 1024.0);
+                        Logger.log(Logger.DEBUG,
+                                String.format("Loaded %d images (%.3fMB) in %.3f seconds.",
+                                images.size(),
+                                totalFileSize,
+                                timer.getLastTimeInSeconds()));
+                } catch (InterruptedException ex) {
+                        ex.printStackTrace();
+                }
+
+                return images;
         }
 
         private boolean isValidFile(File file) {

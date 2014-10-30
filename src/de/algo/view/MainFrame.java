@@ -19,14 +19,17 @@
 
 package de.algo.view;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 public class MainFrame extends JFrame {
+        public final JScrollPane SCROLLPANE_CANVAS;
+        public final JScrollPane SCROLLPANE_GALLERY;
         public final JPanel CANVAS;
         public final JPanel GALLERY;
-
-        public final JSplitPane SPLITPANE;
 
         public final JMenuBar MENUBAR;
         public final JMenu MENU_FILE;
@@ -38,17 +41,31 @@ public class MainFrame extends JFrame {
                 setLayout(new BorderLayout());
 
                 CANVAS = new JPanel();
-                GALLERY = new JPanel();
 
-                SPLITPANE = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, CANVAS, GALLERY);
-                SPLITPANE.setOneTouchExpandable(true);
-                SPLITPANE.setResizeWeight(1.0);
-                add(SPLITPANE, BorderLayout.CENTER);
+                GALLERY = new JPanel();
+                GALLERY.setPreferredSize(new Dimension(300, 0));
+                GALLERY.setLayout(new GridLayout(0, 1, 0, 5));
+
+                SCROLLPANE_CANVAS = new JScrollPane(CANVAS);
+                SCROLLPANE_GALLERY = new JScrollPane(GALLERY) {
+                        @Override
+                        public Dimension getPreferredSize() {
+                                int width = GALLERY.getPreferredSize().width
+                                        + getVerticalScrollBar().getWidth();
+                                int height = getParent().getHeight();
+                                return new Dimension(width, height);
+                        }
+                };
+                SCROLLPANE_GALLERY.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+                SCROLLPANE_GALLERY.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+                add(SCROLLPANE_CANVAS, BorderLayout.CENTER);
+                add(SCROLLPANE_GALLERY, BorderLayout.EAST);
 
                 MENUBAR = new JMenuBar();
-                MENU_FILE = new JMenu("Datei");
-                MENUITEM_OPENIMG = new JMenuItem("Bilder oeffnen..");
-                MENUITEM_EXIT = new JMenuItem("Beenden");
+                MENU_FILE = new JMenu("File");
+                MENUITEM_OPENIMG = new JMenuItem("Open images..");
+                MENUITEM_EXIT = new JMenuItem("Exit");
 
                 MENU_FILE.add(MENUITEM_OPENIMG);
                 MENU_FILE.add(MENUITEM_EXIT);

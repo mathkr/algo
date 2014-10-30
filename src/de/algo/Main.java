@@ -19,10 +19,16 @@
 
 package de.algo;
 
-import de.algo.controller.*;
+import de.algo.controller.Controller;
+import de.algo.model.Model;
+
+import javax.swing.*;
 
 class Main {
 	public static void main (String[] args) {
-                Controller controller = new Controller();
+                SwingUtilities.invokeLater(() -> {
+                        Model model = new Model();
+                        new Controller(model);
+                });
 	}
 }
