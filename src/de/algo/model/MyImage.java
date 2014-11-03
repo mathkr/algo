@@ -25,12 +25,14 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.ImageObserver;
 
 public class MyImage {
-        private String identifier;
+        public final String IDENTIFIER;
+        public int[] data;
         private BufferedImage image;
-        private int[] data;
 
-        public MyImage(String identifier, Image source, ImageObserver io) {
-                this.identifier = identifier;
+        public MyImage(String identifier, Image source) {
+                this.IDENTIFIER = identifier;
+
+                ImageObserver io = (img, infoflags, x, y, width, height) -> false;
 
                 image = new BufferedImage(
                         source.getWidth(io),
@@ -39,5 +41,9 @@ public class MyImage {
 
                 image.getGraphics().drawImage(source, 0, 0, io);
                 data = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        }
+
+        public BufferedImage getBufferedImage() {
+                return image;
         }
 }

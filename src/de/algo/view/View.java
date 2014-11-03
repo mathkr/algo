@@ -21,21 +21,25 @@ package de.algo.view;
 
 import de.algo.controller.Controller;
 import de.algo.model.Model;
+import de.algo.model.MyImage;
 import de.algo.util.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.image.ImageObserver;
 import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class View implements Observer {
         private Controller controller;
         private Model model;
 
         private JFileChooser fileChooser;
+        private SelectDialog slideshowSelectDialog;
 
         public final MainFrame MAIN_FRAME;
         public final FileNameExtensionFilter FILEFILTER;
@@ -52,6 +56,8 @@ public class View implements Observer {
                 fileChooser.setMultiSelectionEnabled(true);
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 fileChooser.setFileFilter(FILEFILTER);
+
+                slideshowSelectDialog = new SelectDialog(MAIN_FRAME, new ImageSelectorPanel(200, 3, 10, true));
 
                 addListeners();
 
@@ -76,6 +82,82 @@ public class View implements Observer {
                                 controller.processSelectedFiles(files);
                         }
                 });
+
+                MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
+                        if (model.loadedImages.isEmpty()) {
+                                JOptionPane.showMessageDialog(MAIN_FRAME,
+                                        "No images have been opened. Select File -> Open images..");
+                        } else {
+                                slideshowSelectDialog.setImages(model.loadedImages.values());
+                                slideshowSelectDialog.pack();
+                                slideshowSelectDialog.setLocationRelativeTo(null);
+                                slideshowSelectDialog.setVisible(true);
+                        }
+                });
+
+                slideshowSelectDialog.addActionListener(event -> {
+                        Logger.log(Logger.DEBUG, "Starting slideshow with:");
+
+                        Set<String> selected = slideshowSelectDialog.SELECTORPANEL.getSelected();
+                        List<MyImage> images = selected
+                                .stream()
+                                .map(s -> {
+                                        Logger.log(Logger.DEBUG, s);
+                                        return model.loadedImages.get(s);
+                                })
+                                .collect(Collectors.toList());
+
+                        Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+                        SlideshowPanel slideshowPanel = new SlideshowPanel(images, 2000, 1000,
+                                screen.width, screen.height);
+
+                        JWindow slideshowWindow = new JWindow();
+                        slideshowWindow.setLayout(new BorderLayout());
+                        slideshowWindow.add(slideshowPanel);
+
+                        slideshowWindow.setPreferredSize(screen);
+
+                        slideshowWindow.pack();
+                        slideshowWindow.setLocationRelativeTo(null);
+                        slideshowWindow.setVisible(true);
+
+                        slideshowPanel.start();
+                });
+        }
+
+        public static void drawImageCentered(Image img, Graphics g, int width, int height, int iWidth, int iHeight) {
+                double aspectRatio = (double) iWidth / (double) iHeight;
+
+                int x, y, w, h;
+                x = y = w = h = 0;
+
+                if (aspectRatio >= 1.0) {
+                        if (iWidth < width) {
+                                w = iWidth;
+                                h = iHeight;
+                                x = (width - iWidth) / 2;
+                                y = (height - iHeight) / 2;
+                        } else {
+                                w = width;
+                                h = (int)(width / aspectRatio);
+                                x = 0;
+                                y = (height - h) / 2;
+                        }
+                } else {
+                        if (iHeight < height) {
+                                w = iWidth;
+                                h = iHeight;
+                                x = (width - iWidth) / 2;
+                                y = (height - iHeight) / 2;
+                        } else {
+                                h = height;
+                                w = (int)(h * aspectRatio);
+                                x = (width - w) / 2;
+                                y = 0;
+                        }
+                }
+
+                g.drawImage(img, x, y, w, h, (im ,i, a, b, c, d) -> false);
         }
 
         @Override
@@ -85,18 +167,6 @@ public class View implements Observer {
         }
 
         public void updateGallery() {
-                MAIN_FRAME.GALLERY.removeAll();
-                model.loadedImages.forEach((identifier, image) -> {
-                        GalleryTilePanel panel = new GalleryTilePanel(identifier, image);
-                        panel.addMouseListener(new MouseAdapter() {
-                                @Override
-                                public void mouseClicked(MouseEvent e) {
-                                        Logger.log(Logger.DEBUG, identifier + " clicked in gallery.");
-                                }
-                        });
-                        MAIN_FRAME.GALLERY.add(panel);
-                });
-                MAIN_FRAME.GALLERY.setPreferredSize(new Dimension(300, model.loadedImages.size() * 300));
-                MAIN_FRAME.revalidate();
+                MAIN_FRAME.GALLERY.addTiles(model.loadedImages.values());
         }
 }

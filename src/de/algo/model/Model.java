@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Observable;
 
 public class Model extends Observable {
-        public Map<String, Image> loadedImages;
+        public Map<String, MyImage> loadedImages;
 
         public Model() {
                 loadedImages = new HashMap<>();
@@ -34,7 +34,7 @@ public class Model extends Observable {
         public void addImages(Map<String, Image> images) {
                 images.forEach((key, image) -> {
                         if (!loadedImages.containsKey(key)) {
-                                loadedImages.put(key, image);
+                                loadedImages.put(key, new MyImage(key, image));
                                 setChanged();
                         }
                 });
