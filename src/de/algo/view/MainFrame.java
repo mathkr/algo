@@ -23,9 +23,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
-        public final JScrollPane SCROLLPANE_CANVAS;
-        public final JScrollPane SCROLLPANE_GALLERY;
-        public final JPanel CANVAS;
+        public final JPanel CANVASAREA;
+        public final JToolBar TOOLBAR;
+        public final GalleryPanel GALLERYAREA;
+        public final JTabbedPane CANVASTABS;
         public final ImageSelectorPanel GALLERY;
 
         public final JMenuBar MENUBAR;
@@ -40,18 +41,24 @@ public class MainFrame extends JFrame {
                 super();
                 setLayout(new BorderLayout());
 
-                CANVAS = new JPanel();
+                CANVASAREA = new JPanel();
+                CANVASAREA.setLayout(new BorderLayout());
+                CANVASAREA.setBorder(BorderFactory.createEmptyBorder(2, 0, 2, 0));
+                CANVASTABS = new JTabbedPane();
+                CANVASAREA.add(CANVASTABS, BorderLayout.CENTER);
+
+                TOOLBAR = new JToolBar();
+                TOOLBAR.addSeparator(new Dimension(20, 20));
+                CANVASAREA.add(TOOLBAR, BorderLayout.WEST);
 
                 GALLERY = new ImageSelectorPanel(300, 1, 10, false);
+                GALLERYAREA = new GalleryPanel(GALLERY);
 
-                SCROLLPANE_CANVAS = new JScrollPane(CANVAS);
-                SCROLLPANE_GALLERY = new JScrollPane(GALLERY);
-                SCROLLPANE_GALLERY.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-                SCROLLPANE_GALLERY.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                SCROLLPANE_GALLERY.getVerticalScrollBar().setUnitIncrement(16);
+                add(CANVASAREA, BorderLayout.CENTER);
+                add(GALLERYAREA, BorderLayout.EAST);
 
-                add(SCROLLPANE_CANVAS, BorderLayout.CENTER);
-                add(SCROLLPANE_GALLERY, BorderLayout.EAST);
+                InfoBar infoBar = InfoBar.getInfoBar(5);
+                add(infoBar, BorderLayout.SOUTH);
 
                 MENUBAR = new JMenuBar();
 

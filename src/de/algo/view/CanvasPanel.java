@@ -17,35 +17,34 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.algo.model;
+package de.algo.view;
 
-import de.algo.view.InfoBar;
+import de.algo.model.MyImage;
 
+import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Observable;
+import java.util.Observer;
 
-public class Model extends Observable {
-        public Map<String, MyImage> loadedImages;
+public class CanvasPanel extends JPanel implements Observer {
+        private MyImage image;
 
-        public Model() {
-                loadedImages = new HashMap<>();
+        public CanvasPanel(MyImage image) {
+                this.image = image;
+                image.addObserver(this);
+
+                setPreferredSize(new Dimension(image.getBufferedImage().getWidth(),
+                        image.getBufferedImage().getHeight()));
         }
 
-        public void addImages(Map<String, Image> images) {
-                int diff = loadedImages.size();
+        @Override
+        public void update(Observable o, Object arg) {
+                repaint();
+        }
 
-                images.forEach((key, image) -> {
-                        if (!loadedImages.containsKey(key)) {
-                                loadedImages.put(key, new MyImage(key, image));
-                                setChanged();
-                        }
-                });
-
-                diff = loadedImages.size() - diff;
-                InfoBar.publish(diff + " images added.");
-
-                notifyObservers();
+        @Override
+        protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(image.getBufferedImage(), 0, 0, this);
         }
 }

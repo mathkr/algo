@@ -25,27 +25,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 public class ThumbnailPanel extends JPanel {
         public MyImage image;
 
-        private double aspectRatio;
-        private int iWidth;
-        private int iHeight;
         private boolean selected;
 
         public ThumbnailPanel(int size, MyImage image) {
                 super();
 
-                this.image = image;
-                this.selected = false;
+                selected = false;
 
-                iWidth = image.getBufferedImage().getWidth(this);
-                iHeight = image.getBufferedImage().getHeight(this);
-                aspectRatio = (double) iWidth / (double) iHeight;
+                int iWidth = image.getBufferedImage().getWidth(this);
+                int iHeight = image.getBufferedImage().getHeight(this);
+
+                BufferedImage buffer = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+                View.drawImageCentered(image.getBufferedImage(), buffer.getGraphics(),
+                        size, size, iWidth, iHeight);
+                this.image = new MyImage(image.IDENTIFIER, buffer);
 
                 setBackground(Color.DARK_GRAY);
                 setForeground(Color.WHITE);
+
                 setPreferredSize(new Dimension(size, size));
 
                 addMouseListener(new MouseAdapter() {
@@ -63,17 +65,7 @@ public class ThumbnailPanel extends JPanel {
         public void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                /*
-                if (aspectRatio >= 1.0) {
-                        int w = getWidth();
-                        int h = (int)(w / aspectRatio);
-                        g.drawImage(image.getBufferedImage(), 0, (getHeight() - h) / 2, w, h, this);
-                } else {
-                        int h = getHeight();
-                        int w = (int)(h * aspectRatio);
-                        g.drawImage(image.getBufferedImage(), (getWidth() - w) / 2, 0, w, h, this);
-                }*/
-                View.drawImageCentered(image.getBufferedImage(), g, getWidth(), getHeight(), iWidth, iHeight);
+                g.drawImage(image.getBufferedImage(), 0, 0, this);
 
                 if (selected) {
                         Graphics2D g2d = (Graphics2D)g;

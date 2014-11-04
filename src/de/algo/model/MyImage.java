@@ -23,8 +23,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.awt.image.ImageObserver;
+import java.util.Observable;
 
-public class MyImage {
+public class MyImage extends Observable {
         public final String IDENTIFIER;
         public int[] data;
         private BufferedImage image;
@@ -32,14 +33,21 @@ public class MyImage {
         public MyImage(String identifier, Image source) {
                 this.IDENTIFIER = identifier;
 
-                ImageObserver io = (img, infoflags, x, y, width, height) -> false;
+                if (source instanceof BufferedImage
+                        && ((BufferedImage)source).getType() == BufferedImage.TYPE_INT_ARGB) {
 
-                image = new BufferedImage(
-                        source.getWidth(io),
-                        source.getHeight(io),
-                        BufferedImage.TYPE_INT_ARGB);
+                        image = (BufferedImage)source;
+                } else {
+                        ImageObserver io = (img, infoflags, x, y, width, height) -> false;
 
-                image.getGraphics().drawImage(source, 0, 0, io);
+                        image = new BufferedImage(
+                                source.getWidth(io),
+                                source.getHeight(io),
+                                BufferedImage.TYPE_INT_ARGB);
+
+                        image.getGraphics().drawImage(source, 0, 0, io);
+                }
+
                 data = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         }
 

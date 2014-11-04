@@ -22,13 +22,15 @@ package de.algo.controller;
 import de.algo.model.Model;
 import de.algo.util.Logger;
 import de.algo.util.Timer;
+import de.algo.view.InfoBar;
 import de.algo.view.View;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,34 +51,47 @@ public class Controller {
 
         public void processSelectedFiles(File[] selected) {
                 Logger.log(Logger.DEBUG, "Attempting to load files.");
+                InfoBar.publish("Loading images..");
 
-                List<File> files = new ArrayList<>(Arrays.asList(selected));
-                List<File> directoryFiles = files
-                        .stream()
-                        .filter(File::isDirectory)
-                        .map(File::listFiles)
-                        .map(Arrays::stream)
-                        .flatMap(Function.<Stream<File>>identity())
-                        .collect(Collectors.toList());
+                new Thread(() -> {
+                        Timer timer = new Timer();
+                        timer.start();
 
-                files.addAll(directoryFiles);
+                        List<File> files = new ArrayList<>(Arrays.asList(selected));
+                        List<File> directoryFiles = files
+                                .stream()
+                                .filter(File::isDirectory)
+                                .map(File::listFiles)
+                                .map(Arrays::stream)
+                                .flatMap(Function.<Stream<File>>identity())
+                                .collect(Collectors.toList());
 
-                files = files
-                        .stream()
-                        .filter(f -> isValidFile(f))
-                        .map(f -> {
-                                Logger.log(Logger.DEBUG, "Loading " + f.getPath());
-                                return f;
-                        })
-                        .collect(Collectors.toList());
+                        files.addAll(directoryFiles);
 
-                if (files.isEmpty()) {
-                        Logger.log(Logger.INFO, "No image files found.");
-                } else {
-                        Map<String, Image> imageMap = loadImages(files);
-                        model.addImages(imageMap);
-                        view.updateGallery();
-                }
+                        files = files
+                                .stream()
+                                .filter(f -> isValidFile(f))
+                                .map(f -> {
+                                        Logger.log(Logger.DEBUG, "Loading " + f.getPath());
+                                        return f;
+                                })
+                                .collect(Collectors.toList());
+
+                        if (files.isEmpty()) {
+                                Logger.log(Logger.INFO, "No image files found.");
+                                SwingUtilities.invokeLater(()
+                                        -> InfoBar.publish("No image files found"));
+                        } else {
+                                Map<String, Image> imageMap = loadImages(files);
+                                model.addImages(imageMap);
+                                SwingUtilities.invokeLater(() -> view.updateGallery());
+
+                                timer.stop();
+                                Logger.log(
+                                        Logger.DEBUG, String.format("Loaded images in %.3f seconds.",
+                                                timer.getLastTimeInSeconds()));
+                        }
+                }).start();
         }
 
         private Map<String, Image> loadImages(List<File> files) {
@@ -85,8 +100,6 @@ public class Controller {
                 Map<String, Image> images = new HashMap<>();
                 int trackerID = 0;
 
-                Timer timer = new Timer();
-                timer.start();
 
                 for (File file : files) {
                         Image image = toolkit.createImage(file.getPath());
@@ -96,16 +109,6 @@ public class Controller {
 
                 try {
                         mediaTracker.waitForAll();
-                        timer.stop();
-                        double totalFileSize = files
-                                .stream()
-                                .map(File::length)
-                                .reduce(0L, (acc, s) -> acc + s) / (1024.0 * 1024.0);
-                        Logger.log(Logger.DEBUG,
-                                String.format("Loaded %d images (%.3fMB) in %.3f seconds.",
-                                images.size(),
-                                totalFileSize,
-                                timer.getLastTimeInSeconds()));
                 } catch (InterruptedException ex) {
                         ex.printStackTrace();
                 }

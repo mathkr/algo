@@ -28,7 +28,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.util.*;
 import java.util.List;
@@ -44,10 +43,14 @@ public class View implements Observer {
         public final MainFrame MAIN_FRAME;
         public final FileNameExtensionFilter FILEFILTER;
 
+        public Map<String, CanvasPanel> openCanvasPanels;
+
         public View(Model model, Controller controller) {
                 this.controller = controller;
                 this.model = model;
                 model.addObserver(this);
+
+                openCanvasPanels = new HashMap<>();
 
                 MAIN_FRAME = new MainFrame();
 
@@ -74,12 +77,20 @@ public class View implements Observer {
                 });
 
                 MAIN_FRAME.MENUITEM_EXIT.addActionListener(event -> controller.exit());
+                MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(event -> openFiles());
+                MAIN_FRAME.GALLERYAREA.ADD.addActionListener(event -> openFiles());
 
-                MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(event -> {
-                        final int result = fileChooser.showOpenDialog(MAIN_FRAME);
-                        if (result == JFileChooser.APPROVE_OPTION) {
-                                File[] files = fileChooser.getSelectedFiles();
-                                controller.processSelectedFiles(files);
+                MAIN_FRAME.GALLERYAREA.EDIT.addActionListener(event -> {
+                        if (!MAIN_FRAME.GALLERY.getSelected().isEmpty()) {
+                                MAIN_FRAME.GALLERY.getSelected().forEach(s -> {
+                                        if (!openCanvasPanels.containsKey(s)) {
+                                                File file = new File(s);
+                                                String title = file.getName();
+                                                CanvasPanel canvas = new CanvasPanel(model.loadedImages.get(s));
+                                                openCanvasPanels.put(s, canvas);
+                                                MAIN_FRAME.CANVASTABS.add(title, canvas);
+                                        }
+                                });
                         }
                 });
 
@@ -108,53 +119,50 @@ public class View implements Observer {
                                 .collect(Collectors.toList());
 
                         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-                        SlideshowPanel slideshowPanel = new SlideshowPanel(images, 2000, 1000,
-                                screen.width, screen.height);
-
-                        JWindow slideshowWindow = new JWindow();
-                        slideshowWindow.setLayout(new BorderLayout());
-                        slideshowWindow.add(slideshowPanel);
-
-                        slideshowWindow.setPreferredSize(screen);
-
-                        slideshowWindow.pack();
-                        slideshowWindow.setLocationRelativeTo(null);
-                        slideshowWindow.setVisible(true);
-
-                        slideshowPanel.start();
+                        SlideshowPanel panel = new SlideshowPanel(images, 2000, 1000, screen.width, screen.height);
+                        new SlideshowDialog(panel, screen, MAIN_FRAME);
                 });
+        }
+
+        private void openFiles() {
+                final int result = fileChooser.showOpenDialog(MAIN_FRAME);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                        File[] files = fileChooser.getSelectedFiles();
+                        controller.processSelectedFiles(files);
+                }
+        }
+
+        public static ImageIcon getIcon(String path) {
+                File file = new File("icons/black/png/" + path + ".png");
+
+                if (file.exists() && file.canRead()) {
+                        return new ImageIcon(file.getPath());
+                } else {
+                        Logger.log(Logger.ERROR, "Icon path does not exist or can not be read: " + file.getPath());
+                        return null;
+                }
         }
 
         public static void drawImageCentered(Image img, Graphics g, int width, int height, int iWidth, int iHeight) {
                 double aspectRatio = (double) iWidth / (double) iHeight;
 
                 int x, y, w, h;
-                x = y = w = h = 0;
 
-                if (aspectRatio >= 1.0) {
-                        if (iWidth < width) {
-                                w = iWidth;
-                                h = iHeight;
-                                x = (width - iWidth) / 2;
-                                y = (height - iHeight) / 2;
-                        } else {
-                                w = width;
-                                h = (int)(width / aspectRatio);
-                                x = 0;
-                                y = (height - h) / 2;
-                        }
+                if (iWidth < width && iHeight < height) {
+                        w = iWidth;
+                        h = iHeight;
+                        x = (width - iWidth) / 2;
+                        y = (height - iHeight) / 2;
+                } else if (aspectRatio >= 1.0) {
+                        w = width;
+                        h = (int)(width / aspectRatio);
+                        x = 0;
+                        y = (height - h) / 2;
                 } else {
-                        if (iHeight < height) {
-                                w = iWidth;
-                                h = iHeight;
-                                x = (width - iWidth) / 2;
-                                y = (height - iHeight) / 2;
-                        } else {
-                                h = height;
-                                w = (int)(h * aspectRatio);
-                                x = (width - w) / 2;
-                                y = 0;
-                        }
+                        h = height;
+                        w = (int)(h * aspectRatio);
+                        x = (width - w) / 2;
+                        y = 0;
                 }
 
                 g.drawImage(img, x, y, w, h, (im ,i, a, b, c, d) -> false);
