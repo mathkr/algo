@@ -30,6 +30,8 @@ public class MyImage extends Observable {
         public int[] data;
         private BufferedImage image;
 
+        private Selection selection;
+
         public MyImage(String identifier, Image source) {
                 this.IDENTIFIER = identifier;
 
@@ -49,6 +51,30 @@ public class MyImage extends Observable {
                 }
 
                 data = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        }
+
+        public void setSelection(Vector3 a, Vector3 b) {
+                Vector3 topL = new Vector3(Math.min(a.x, b.x), Math.min(a.y, b.y), 1);
+                Vector3 botR = new Vector3(Math.max(a.x, b.x), Math.max(a.y, b.y), 1);
+                this.selection = new Selection(topL, botR);
+
+                setChanged();
+                notifyObservers();
+        }
+
+        public boolean hasSelection() {
+                return selection != null;
+        }
+
+        public Selection getSelection() {
+                return selection;
+        }
+
+        public void removeSelection() {
+                selection = null;
+
+                setChanged();
+                notifyObservers();
         }
 
         public BufferedImage getBufferedImage() {

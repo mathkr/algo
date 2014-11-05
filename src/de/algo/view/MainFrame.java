@@ -19,12 +19,14 @@
 
 package de.algo.view;
 
+import de.algo.view.tools.MyToolbar;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
         public final JPanel CANVASAREA;
-        public final JToolBar TOOLBAR;
+        public final MyToolbar TOOLBAR;
         public final GalleryPanel GALLERYAREA;
         public final JTabbedPane CANVASTABS;
         public final ImageSelectorPanel GALLERY;
@@ -47,8 +49,7 @@ public class MainFrame extends JFrame {
                 CANVASTABS = new JTabbedPane();
                 CANVASAREA.add(CANVASTABS, BorderLayout.CENTER);
 
-                TOOLBAR = new JToolBar();
-                TOOLBAR.addSeparator(new Dimension(20, 20));
+                TOOLBAR = new MyToolbar();
                 CANVASAREA.add(TOOLBAR, BorderLayout.WEST);
 
                 GALLERY = new ImageSelectorPanel(300, 1, 10, false);

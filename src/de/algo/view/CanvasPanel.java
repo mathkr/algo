@@ -20,21 +20,72 @@
 package de.algo.view;
 
 import de.algo.model.MyImage;
+import de.algo.model.Selection;
+import de.algo.view.tools.MyToolbar;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
 
 public class CanvasPanel extends JPanel implements Observer {
-        private MyImage image;
+        public MyImage image;
+        private Stroke selectionStroke;
 
-        public CanvasPanel(MyImage image) {
+        public CanvasPanel(MyImage image, MyToolbar toolbar) {
                 this.image = image;
+
+                float[] dash = { 5f, 5f };
+                selectionStroke = new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1f, dash, 0f);
+
                 image.addObserver(this);
 
-                setPreferredSize(new Dimension(image.getBufferedImage().getWidth(),
-                        image.getBufferedImage().getHeight()));
+                addMouseMotionListener(new MouseAdapter() {
+                        @Override
+                        public void mouseDragged(MouseEvent e) {
+                                toolbar.getMouseListener().mouseDragged(e);
+                        }
+
+                        @Override
+                        public void mouseMoved(MouseEvent e) {
+                                toolbar.getMouseListener().mouseMoved(e);
+                        }
+                });
+
+                addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                                toolbar.getMouseListener().mouseClicked(e);
+                        }
+
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                                toolbar.getMouseListener().mousePressed(e);
+                        }
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                                toolbar.getMouseListener().mouseReleased(e);
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                                toolbar.getMouseListener().mouseEntered(e);
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+                                toolbar.getMouseListener().mouseExited(e);
+                        }
+                });
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+                return new Dimension(image.getBufferedImage().getWidth(),
+                        image.getBufferedImage().getHeight());
         }
 
         @Override
@@ -46,5 +97,16 @@ public class CanvasPanel extends JPanel implements Observer {
         protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(image.getBufferedImage(), 0, 0, this);
+
+                if (image.hasSelection()) {
+                        paintSelection(g, image.getSelection());
+                }
+        }
+
+        private void paintSelection(Graphics g, Selection s) {
+                Graphics2D g2d = (Graphics2D)g;
+                g2d.setStroke(selectionStroke);
+                g2d.setXORMode(Color.LIGHT_GRAY);
+                g2d.drawRect(s.topL.x, s.topL.y, s.botR.x - s.topL.x, s.botR.y - s.topL.y);
         }
 }

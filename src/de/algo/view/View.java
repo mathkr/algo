@@ -81,17 +81,28 @@ public class View implements Observer {
                 MAIN_FRAME.GALLERYAREA.ADD.addActionListener(event -> openFiles());
 
                 MAIN_FRAME.GALLERYAREA.EDIT.addActionListener(event -> {
-                        if (!MAIN_FRAME.GALLERY.getSelected().isEmpty()) {
-                                MAIN_FRAME.GALLERY.getSelected().forEach(s -> {
-                                        if (!openCanvasPanels.containsKey(s)) {
-                                                File file = new File(s);
-                                                String title = file.getName();
-                                                CanvasPanel canvas = new CanvasPanel(model.loadedImages.get(s));
-                                                openCanvasPanels.put(s, canvas);
-                                                MAIN_FRAME.CANVASTABS.add(title, canvas);
-                                        }
-                                });
+                        if (MAIN_FRAME.GALLERY.getSelected().isEmpty()) {
+                                return;
                         }
+
+                        MAIN_FRAME.GALLERY.getSelected().forEach(s -> {
+                                if (!openCanvasPanels.containsKey(s)) {
+                                        File file = new File(s);
+                                        String title = file.getName();
+
+                                        CanvasPanel canvas =
+                                                new CanvasPanel(model.loadedImages.get(s), MAIN_FRAME.TOOLBAR);
+                                        openCanvasPanels.put(s, canvas);
+
+                                        JScrollPane scrollPane = new JScrollPane();
+                                        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+                                        scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+                                        scrollPane.getViewport().add(canvas);
+
+                                        MAIN_FRAME.CANVASTABS.add(title, scrollPane);
+                                        MAIN_FRAME.CANVASTABS.setSelectedComponent(scrollPane);
+                                }
+                        });
                 });
 
                 MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
