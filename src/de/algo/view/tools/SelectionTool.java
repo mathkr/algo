@@ -14,20 +14,23 @@ public class SelectionTool extends MouseInputAdapter {
         public void mousePressed(MouseEvent e) {
                 start = new Vector3(e.getX(), e.getY(), 1);
                 end = null;
-                ((CanvasPanel)e.getComponent()).image.removeSelection();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-                end = new Vector3(e.getX(), e.getY(), 1);
+                if (start != null) {
+                        end = new Vector3(e.getX(), e.getY(), 1);
 
-                ((CanvasPanel)e.getComponent()).image.setSelection(start, end);
+                        ((CanvasPanel)e.getComponent()).image.setSelection(start, end);
+                }
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-                end = new Vector3(e.getX(), e.getY(), 1);
+                if (start != null) {
+                        end = new Vector3(e.getX(), e.getY(), 1);
 
-                ((CanvasPanel)e.getComponent()).image.setSelection(start, end);
+                        ((CanvasPanel)e.getComponent()).image.setSelection(start, end);
+                }
         }
 }

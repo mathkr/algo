@@ -19,6 +19,7 @@
 
 package de.algo.controller;
 
+import de.algo.model.Matrix;
 import de.algo.model.Model;
 import de.algo.util.Logger;
 import de.algo.util.Timer;
@@ -28,7 +29,6 @@ import de.algo.view.View;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -40,6 +40,7 @@ public class Controller {
         private Model model;
 
         public Controller(Model model) {
+                Matrix m = new Matrix();
                 this.model = model;
                 view = new View(model, this);
         }

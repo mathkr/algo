@@ -20,4 +20,11 @@ public class Selection {
                 this.topL = topL;
                 this.botR = botR;
         }
+
+        public Vector3 getCenter() {
+                int x = topL.x + (botR.x - topL.x) / 2;
+                int y = topL.y + (botR.y - topL.y) / 2;
+
+                return new Vector3(x, y);
+        }
 }

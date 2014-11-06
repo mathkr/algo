@@ -18,6 +18,11 @@ public class ToolButton extends JButton {
                 setToolTipText(tooltip);
         }
 
+        @Override
+        public Dimension getPreferredSize() {
+                return new Dimension(32, 32);
+        }
+
         public MouseInputListener getTool() {
                 return tool;
         }
