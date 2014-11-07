@@ -101,10 +101,6 @@ public class View implements Observer {
                 MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(event -> openFiles());
                 MAIN_FRAME.MENUITEM_EXIT.addActionListener(event -> controller.exit());
 
-                MAIN_FRAME.MENUITEM_RESETIMG.addActionListener(event -> getSelectedCanvas().image.resetModifiedImage());
-                MAIN_FRAME.MENUITEM_RESETSEL.addActionListener(event -> getSelectedCanvas().image.removeSelection());
-                MAIN_FRAME.MENUITEM_RESETPIV.addActionListener(event -> getSelectedCanvas().image.removePivot());
-
                 MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
                         if (model.loadedImages.isEmpty()) {
                                 JOptionPane.showMessageDialog(MAIN_FRAME,

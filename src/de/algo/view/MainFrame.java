@@ -37,11 +37,6 @@ public class MainFrame extends JFrame {
         public final JMenuItem MENUITEM_OPENIMG;
         public final JMenuItem MENUITEM_EXIT;
 
-        public final JMenu MENU_EDIT;
-        public final JMenuItem MENUITEM_RESETIMG;
-        public final JMenuItem MENUITEM_RESETSEL;
-        public final JMenuItem MENUITEM_RESETPIV;
-
         public final JMenu MENU_VIEW;
         public final JMenuItem MENUITEM_SLIDESHOW;
 
@@ -75,20 +70,11 @@ public class MainFrame extends JFrame {
                 MENU_FILE.add(MENUITEM_OPENIMG);
                 MENU_FILE.add(MENUITEM_EXIT);
 
-                MENU_EDIT = new JMenu("Edit");
-                MENUITEM_RESETIMG = new JMenuItem("Reset current image");
-                MENUITEM_RESETSEL = new JMenuItem("Reset selection");
-                MENUITEM_RESETPIV = new JMenuItem("Reset pivot");
-                MENU_EDIT.add(MENUITEM_RESETIMG);
-                MENU_EDIT.add(MENUITEM_RESETSEL);
-                MENU_EDIT.add(MENUITEM_RESETPIV);
-
                 MENU_VIEW = new JMenu("View");
                 MENUITEM_SLIDESHOW = new JMenuItem("Start slideshow..");
                 MENU_VIEW.add(MENUITEM_SLIDESHOW);
 
                 MENUBAR.add(MENU_FILE);
-                MENUBAR.add(MENU_EDIT);
                 MENUBAR.add(MENU_VIEW);
                 setJMenuBar(MENUBAR);
         }

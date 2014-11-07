@@ -55,7 +55,7 @@ public class MyToolbar extends JToolBar {
 
                 ToolButton selectionButton = new ToolButton(
                         new SelectionTool(),
-                        View.getIcon("checkbox_unchecked_icon&24"),
+                        View.getIcon("selection_icon&24"),
                         "Selection tool");
                 selectionButton.addActionListener(select);
                 add(selectionButton);
@@ -116,6 +116,23 @@ public class MyToolbar extends JToolBar {
                 pasteButton.setToolTipText("Paste tool");
                 pasteButton.addActionListener(new PasteTool());
                 add(pasteButton);
+
+                add(Box.createVerticalStrut(20));
+
+                JButton resetImageButton = new JButton(View.getIcon("shapes_remove_icon&24"));
+                resetImageButton.setToolTipText("Reset image");
+                resetImageButton.addActionListener(event -> View.getSelectedCanvas().image.resetModifiedImage());
+                add(resetImageButton);
+
+                JButton resetSelectionButton = new JButton(View.getIcon("selection_remove_icon&24"));
+                resetSelectionButton.setToolTipText("Reset selection");
+                resetSelectionButton.addActionListener(event -> View.getSelectedCanvas().image.removeSelection());
+                add(resetSelectionButton);
+
+                JButton resetPivotButton = new JButton(View.getIcon("target_remove_icon&24"));
+                resetPivotButton.setToolTipText("Reset pivot");
+                resetPivotButton.addActionListener(event -> View.getSelectedCanvas().image.removePivot());
+                add(resetPivotButton);
         }
 
         public MouseInputListener getMouseListener() {
