@@ -81,6 +81,9 @@ public class MyImage extends Observable {
         }
 
         public void resetModifiedImage() {
+                transformationMatrix = Matrix.getIdentityMatrix();
+                inverseMatrix = Matrix.getIdentityMatrix();
+
                 System.arraycopy(originalData, 0, modifiedData, 0, originalData.length);
 
                 setChanged();
