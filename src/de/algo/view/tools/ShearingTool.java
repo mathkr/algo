@@ -76,30 +76,12 @@ public class ShearingTool extends MouseInputAdapter {
                         } else {
                                 direction = start.x <= pivot.x ? 1 : -1;
                         }
-                        /*
-                        Matrix inverse = Matrix.getIdentityMatrix();
-                        inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(pivot.x, pivot.y));
-
-                        Matrix regular;
-
-                        if (xAxis) {
-                                inverse = Matrix.multiply(inverse, Matrix.getShearMatrix(dx / FACTOR * direction, 0));
-                                regular = Matrix.multiply(inverse, Matrix.getShearMatrix(-dx / FACTOR * direction, 0));
-                        } else {
-                                inverse = Matrix.multiply(inverse, Matrix.getShearMatrix(0, dy / FACTOR * direction));
-                                regular = Matrix.multiply(inverse, Matrix.getShearMatrix(0, -dy / FACTOR * direction));
-                        }
-
-                        inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
-                        regular = Matrix.multiply(regular, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
-                        */
 
                         Matrix inverse = Matrix.getIdentityMatrix();
                         Matrix regular = Matrix.getIdentityMatrix();
 
                         inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(pivot.x, pivot.y));
                         regular = Matrix.multiply(regular, Matrix.getTranslationMatrix(pivot.x, pivot.y));
-
 
                         if (xAxis) {
                                 inverse = Matrix.multiply(inverse, Matrix.getShearMatrix(dx / FACTOR * direction, 0));

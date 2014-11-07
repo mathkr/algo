@@ -61,15 +61,18 @@ public class RotationTool extends MouseInputAdapter {
                         double dy = end.y - start.y;
 
                         Matrix inverse = Matrix.getIdentityMatrix();
+                        Matrix regular = Matrix.getIdentityMatrix();
+
                         inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(pivot.x, pivot.y));
+                        regular = Matrix.multiply(regular, Matrix.getTranslationMatrix(pivot.x, pivot.y));
 
-                        Matrix selection = Matrix.multiply(inverse, Matrix.getRotationMatrix(dy));
                         inverse = Matrix.multiply(inverse, Matrix.getRotationMatrix(-dy));
+                        regular = Matrix.multiply(regular, Matrix.getRotationMatrix(dy));
 
-                        selection = Matrix.multiply(selection, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
                         inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
+                        regular = Matrix.multiply(regular, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
 
-                        image.addTransformation(inverse, selection);
+                        image.addTransformation(inverse, regular);
                 }
         }
 }

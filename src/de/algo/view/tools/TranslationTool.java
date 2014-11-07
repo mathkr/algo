@@ -55,7 +55,7 @@ public class TranslationTool extends MouseInputAdapter {
 
         public void translate(Vector3 p, MyImage image) {
                 Matrix inverse = Matrix.getTranslationMatrix(-p.x, -p.y);
-                Matrix selection = Matrix.getTranslationMatrix(p.x, p.y);
-                image.addTransformation(inverse, selection);
+                Matrix regular = Matrix.getTranslationMatrix(p.x, p.y);
+                image.addTransformation(inverse, regular);
         }
 }
