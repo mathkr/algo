@@ -20,19 +20,20 @@
 package de.algo.model;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.awt.image.ImageObserver;
+import java.awt.image.*;
 import java.util.Observable;
 
 public class MyImage extends Observable {
         public final String IDENTIFIER;
 
-        private BufferedImage image;
-        public int[] data;
+        private BufferedImage originalImage;
+        public int[] originalData;
 
         private BufferedImage transformedImage;
         public int[] transformedData;
+
+        private BufferedImage modifiedImage;
+        public int[] modifiedData;
 
         private Matrix inverseMatrix;
         private Matrix transformationMatrix;
@@ -46,25 +47,36 @@ public class MyImage extends Observable {
                 if (source instanceof BufferedImage
                         && ((BufferedImage)source).getType() == BufferedImage.TYPE_INT_ARGB) {
 
-                        image = (BufferedImage)source;
+                        originalImage = (BufferedImage)source;
                 } else {
                         ImageObserver io = (img, infoflags, x, y, width, height) -> false;
 
-                        image = new BufferedImage(
+                        originalImage = new BufferedImage(
                                 source.getWidth(io),
                                 source.getHeight(io),
                                 BufferedImage.TYPE_INT_ARGB);
 
-                        image.getGraphics().drawImage(source, 0, 0, io);
+                        originalImage.getGraphics().drawImage(source, 0, 0, io);
                 }
 
-                transformedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                transformedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-                data = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+                resetModifiedImage();
+
+                originalData = ((DataBufferInt) originalImage.getRaster().getDataBuffer()).getData();
                 transformedData = ((DataBufferInt)transformedImage.getRaster().getDataBuffer()).getData();
+                modifiedData = ((DataBufferInt)modifiedImage.getRaster().getDataBuffer()).getData();
 
                 inverseMatrix = Matrix.getIdentityMatrix();
                 transformationMatrix = Matrix.getIdentityMatrix();
+        }
+
+        public void resetModifiedImage() {
+                ColorModel colorModel = originalImage.getColorModel();
+                boolean isPreMultiplied = originalImage.isAlphaPremultiplied();
+                WritableRaster raster = originalImage.copyData(null);
+                BufferedImage res = new BufferedImage(colorModel, raster, isPreMultiplied, null);
+                modifiedImage = res;
         }
 
         public void setSelection(Vector3 a, Vector3 b) {
@@ -78,10 +90,6 @@ public class MyImage extends Observable {
 
         public boolean hasSelection() {
                 return selection != null;
-        }
-
-        public Selection getSelection() {
-                return selection;
         }
 
         public void removeSelection() {
@@ -114,7 +122,7 @@ public class MyImage extends Observable {
         }
 
         public BufferedImage getBufferedImage() {
-                return image;
+                return originalImage;
         }
 
         private boolean isInSelection(Vector3 p) {
@@ -130,8 +138,8 @@ public class MyImage extends Observable {
         private boolean isInBounds(Vector3 p) {
                 return     p.x >= 0
                         && p.y >= 0
-                        && p.x < image.getWidth()
-                        && p.y < image.getHeight();
+                        && p.x < originalImage.getWidth()
+                        && p.y < originalImage.getHeight();
         }
 
         public BufferedImage getTransformedImage() {
@@ -140,11 +148,11 @@ public class MyImage extends Observable {
                         Vector3 transformedPoint = Matrix.multiply(inverseMatrix, point);
 
                         if (isInSelection(transformedPoint)) {
-                                transformedData[i] = data[coordsToDataIndex(transformedPoint)];
+                                transformedData[i] = modifiedData[coordsToDataIndex(transformedPoint)];
                         } else if (isInSelection(point)) {
                                 transformedData[i] = 0xFFFFFFFF;
                         } else {
-                                transformedData[i] = data[i];
+                                transformedData[i] = modifiedData[i];
                         }
                 }
 
@@ -169,15 +177,19 @@ public class MyImage extends Observable {
                 return res;
         }
 
+        public Vector3 getTransformedSelectionCenter() {
+                return Matrix.multiply(transformationMatrix, selection.getCenter());
+        }
+
         private Vector3 dataIndexToCoords(int index) {
-                int x = index % image.getWidth();
-                int y = index / image.getWidth();
+                int x = index % originalImage.getWidth();
+                int y = index / originalImage.getWidth();
 
                 return new Vector3(x, y);
         }
 
         private int coordsToDataIndex(Vector3 p) {
-                return p.y * image.getWidth() + p.x;
+                return p.y * originalImage.getWidth() + p.x;
         }
 
         public void addTransformation(Matrix inverse, Matrix transformation) {

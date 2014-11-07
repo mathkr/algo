@@ -19,9 +19,6 @@
 
 package de.algo.model;
 
-
-import java.util.Vector;
-
 public class Matrix {
         private double[][] data;
 
