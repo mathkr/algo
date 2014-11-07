@@ -36,6 +36,12 @@ public class Vector3 {
                 this.z = z;
         }
 
+        public Vector3(Vector3 vector) {
+                this.x = vector.x;
+                this.y = vector.y;
+                this.z = vector.z;
+        }
+
         public static Vector3 subtract(Vector3 v1, Vector3 v2) {
                 Vector3 res = new Vector3();
 

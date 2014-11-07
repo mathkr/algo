@@ -17,7 +17,7 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.algo.view.tools;
+package de.algo.view;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;

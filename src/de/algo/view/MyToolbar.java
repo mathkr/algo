@@ -17,9 +17,9 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.algo.view.tools;
+package de.algo.view;
 
-import de.algo.view.View;
+import de.algo.view.tools.*;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -101,6 +101,15 @@ public class MyToolbar extends JToolBar {
                         "Y-Shear tool");
                 shearYButton.addActionListener(select);
                 add(shearYButton);
+
+                add(Box.createVerticalStrut(20));
+
+                ToolButton lineButton = new ToolButton(
+                        new LineTool(),
+                        View.getIcon("pencil_icon&24"),
+                        "Line tool");
+                lineButton.addActionListener(select);
+                add(lineButton);
 
                 selectedTool = cursorButton;
                 selectedTool.setActive(true);

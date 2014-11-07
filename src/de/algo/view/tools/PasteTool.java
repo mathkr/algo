@@ -35,14 +35,14 @@ public class PasteTool implements ActionListener {
         public void actionPerformed(ActionEvent e) {
                 BufferedImage clipboard = CopyTool.getClipboard();
 
-                if (clipboard == null) {
-                        InfoBar.publish("Clipboard is empty");
-                        return;
-                }
-
                 CanvasPanel panel = View.getSelectedCanvas();
 
                 if (panel != null) {
+                        if (clipboard == null) {
+                                InfoBar.publish("Clipboard is empty");
+                                return;
+                        }
+
                         MyImage sink = panel.image;
                         if (sink.hasSelection()) {
                                 Selection sel = sink.getSelection();

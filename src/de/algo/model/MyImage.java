@@ -21,7 +21,8 @@ package de.algo.model;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.util.Observable;
+import java.util.*;
+import java.util.List;
 
 public class MyImage extends Observable {
         public final String IDENTIFIER;
@@ -40,6 +41,7 @@ public class MyImage extends Observable {
 
         private Selection selection;
         private Vector3 pivot;
+        private List<Pixel> tempPixels;
 
         public MyImage(String identifier, Image source) {
                 this.IDENTIFIER = identifier;
@@ -180,6 +182,14 @@ public class MyImage extends Observable {
                         }
                 }
 
+                if (tempPixels != null) {
+                        tempPixels.forEach(pixel -> {
+                                if (isInBounds(pixel)) {
+                                        transformedData[coordsToDataIndex(pixel)] = pixel.pixel;
+                                }
+                        });
+                }
+
                 return transformedImage;
         }
 
@@ -224,10 +234,6 @@ public class MyImage extends Observable {
                 notifyObservers();
         }
 
-        public BufferedImage getModifiedImage() {
-                return modifiedImage;
-        }
-
         public BufferedImage getSelectedArea() {
                 BufferedImage selected = modifiedImage.getSubimage(
                         selection.topL.x,
@@ -253,6 +259,26 @@ public class MyImage extends Observable {
                         w,
                         h,
                         (img, infoflags, a, b, width, height) -> false);
+
+                setChanged();
+                notifyObservers();
+        }
+
+        public void setTempPixels(List<Pixel> tempPixels) {
+                this.tempPixels = tempPixels;
+
+                setChanged();
+                notifyObservers();
+        }
+
+        public void applyPixels(List<Pixel> pixels) {
+                pixels.forEach(pixel -> {
+                        if (isInBounds(pixel)) {
+                                modifiedData[coordsToDataIndex(pixel)] = pixel.pixel;
+                        }
+                });
+
+                tempPixels = null;
 
                 setChanged();
                 notifyObservers();

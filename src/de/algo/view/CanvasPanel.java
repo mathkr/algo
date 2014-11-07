@@ -21,7 +21,6 @@ package de.algo.view;
 
 import de.algo.model.MyImage;
 import de.algo.model.Vector3;
-import de.algo.view.tools.MyToolbar;
 
 import javax.swing.*;
 import java.awt.*;

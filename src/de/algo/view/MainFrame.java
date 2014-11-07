@@ -19,8 +19,6 @@
 
 package de.algo.view;
 
-import de.algo.view.tools.MyToolbar;
-
 import javax.swing.*;
 import java.awt.*;
 
