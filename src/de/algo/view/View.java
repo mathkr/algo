@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class View implements Observer {
+        private static View view;
+
         private Controller controller;
         private Model model;
 
@@ -45,7 +47,7 @@ public class View implements Observer {
 
         public Map<String, CanvasPanel> openCanvasPanels;
 
-        public View(Model model, Controller controller) {
+        private View(Model model, Controller controller) {
                 this.controller = controller;
                 this.model = model;
                 model.addObserver(this);
@@ -68,6 +70,26 @@ public class View implements Observer {
                 MAIN_FRAME.setVisible(true);
         }
 
+        public static View createView(Model model, Controller controller) {
+                if (view == null) {
+                        view = new View(model, controller);
+                }
+
+                return view;
+        }
+
+        public static CanvasPanel getSelectedCanvas() {
+                if (view != null) {
+                        Component activeTab = view.MAIN_FRAME.CANVASTABS.getSelectedComponent();
+
+                        if (activeTab != null) {
+                                return (CanvasPanel)((JScrollPane)activeTab).getViewport().getView();
+                        }
+                }
+
+                return null;
+        }
+
         private void addListeners() {
                 MAIN_FRAME.addWindowListener(new WindowAdapter() {
                         @Override
@@ -76,8 +98,25 @@ public class View implements Observer {
                         }
                 });
 
-                MAIN_FRAME.MENUITEM_EXIT.addActionListener(event -> controller.exit());
                 MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(event -> openFiles());
+                MAIN_FRAME.MENUITEM_EXIT.addActionListener(event -> controller.exit());
+
+                MAIN_FRAME.MENUITEM_RESETIMG.addActionListener(event -> getSelectedCanvas().image.resetModifiedImage());
+                MAIN_FRAME.MENUITEM_RESETSEL.addActionListener(event -> getSelectedCanvas().image.removeSelection());
+                MAIN_FRAME.MENUITEM_RESETPIV.addActionListener(event -> getSelectedCanvas().image.removePivot());
+
+                MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
+                        if (model.loadedImages.isEmpty()) {
+                                JOptionPane.showMessageDialog(MAIN_FRAME,
+                                        "No images have been opened. Select File -> Open images..");
+                        } else {
+                                slideshowSelectDialog.setImages(model.loadedImages.values());
+                                slideshowSelectDialog.pack();
+                                slideshowSelectDialog.setLocationRelativeTo(null);
+                                slideshowSelectDialog.setVisible(true);
+                        }
+                });
+
                 MAIN_FRAME.GALLERYAREA.ADD.addActionListener(event -> openFiles());
 
                 MAIN_FRAME.GALLERYAREA.EDIT.addActionListener(event -> {
@@ -103,18 +142,6 @@ public class View implements Observer {
                                         MAIN_FRAME.CANVASTABS.setSelectedComponent(scrollPane);
                                 }
                         });
-                });
-
-                MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
-                        if (model.loadedImages.isEmpty()) {
-                                JOptionPane.showMessageDialog(MAIN_FRAME,
-                                        "No images have been opened. Select File -> Open images..");
-                        } else {
-                                slideshowSelectDialog.setImages(model.loadedImages.values());
-                                slideshowSelectDialog.pack();
-                                slideshowSelectDialog.setLocationRelativeTo(null);
-                                slideshowSelectDialog.setVisible(true);
-                        }
                 });
 
                 slideshowSelectDialog.addActionListener(event -> {

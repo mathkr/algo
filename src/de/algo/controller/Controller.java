@@ -19,7 +19,6 @@
 
 package de.algo.controller;
 
-import de.algo.model.Matrix;
 import de.algo.model.Model;
 import de.algo.util.Logger;
 import de.algo.util.Timer;
@@ -40,9 +39,8 @@ public class Controller {
         private Model model;
 
         public Controller(Model model) {
-                Matrix m = new Matrix();
                 this.model = model;
-                view = new View(model, this);
+                view = View.createView(model, this);
         }
 
         public void exit() {

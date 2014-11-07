@@ -19,6 +19,8 @@
 
 package de.algo.view;
 
+import de.algo.util.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -67,6 +69,7 @@ public class InfoBar extends JPanel {
         }
 
         public static void publish(String s, int showTime) {
+                Logger.log(Logger.DEBUG, "INFOBAR: " + s);
                 infoBar.label.setText(s);
                 infoBar.label.setIcon(infoBar.icon);
                 infoBar.repaint();

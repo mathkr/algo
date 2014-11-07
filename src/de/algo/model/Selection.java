@@ -46,4 +46,12 @@ public class Selection {
 
                 return new Vector3(x, y);
         }
+
+        public int getWidth() {
+                return botR.x - topL.x;
+        }
+
+        public int getHeight() {
+                return botR.y - topL.y;
+        }
 }

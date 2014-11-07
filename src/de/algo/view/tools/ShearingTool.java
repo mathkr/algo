@@ -63,7 +63,7 @@ public class ShearingTool extends MouseInputAdapter {
                         } else if (image.hasSelection()) {
                                 pivot = image.getTransformedSelectionCenter();
                         } else {
-                                pivot = new Vector3(0, 0);
+                                pivot = image.getImageCenter();
                         }
 
                         double dx = end.x - start.x;

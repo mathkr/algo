@@ -51,6 +51,8 @@ public class MyToolbar extends JToolBar {
                 cursorButton.addActionListener(select);
                 add(cursorButton);
 
+                add(Box.createVerticalStrut(20));
+
                 ToolButton selectionButton = new ToolButton(
                         new SelectionTool(),
                         View.getIcon("checkbox_unchecked_icon&24"),
@@ -102,6 +104,18 @@ public class MyToolbar extends JToolBar {
 
                 selectedTool = cursorButton;
                 selectedTool.setActive(true);
+
+                add(Box.createVerticalStrut(20));
+
+                JButton copyButton = new JButton(View.getIcon("clipboard_copy_icon&24"));
+                copyButton.setToolTipText("Copy tool");
+                copyButton.addActionListener(new CopyTool());
+                add(copyButton);
+
+                JButton pasteButton = new JButton(View.getIcon("clipboard_past_icon&24"));
+                pasteButton.setToolTipText("Paste tool");
+                pasteButton.addActionListener(new PasteTool());
+                add(pasteButton);
         }
 
         public MouseInputListener getMouseListener() {

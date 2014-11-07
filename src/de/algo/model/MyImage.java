@@ -48,6 +48,11 @@ public class MyImage extends Observable {
                         && ((BufferedImage)source).getType() == BufferedImage.TYPE_INT_ARGB) {
 
                         originalImage = (BufferedImage)source;
+
+                        ColorModel colorModel = originalImage.getColorModel();
+                        boolean isPreMultiplied = originalImage.isAlphaPremultiplied();
+                        WritableRaster raster = originalImage.copyData(null);
+                        modifiedImage = new BufferedImage(colorModel, raster, isPreMultiplied, null);
                 } else {
                         ImageObserver io = (img, infoflags, x, y, width, height) -> false;
 
@@ -56,12 +61,16 @@ public class MyImage extends Observable {
                                 source.getHeight(io),
                                 BufferedImage.TYPE_INT_ARGB);
 
+                        modifiedImage = new BufferedImage(
+                                source.getWidth(io),
+                                source.getHeight(io),
+                                BufferedImage.TYPE_INT_ARGB);
+
                         originalImage.getGraphics().drawImage(source, 0, 0, io);
+                        modifiedImage.getGraphics().drawImage(source, 0, 0, io);
                 }
 
                 transformedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-                resetModifiedImage();
 
                 originalData = ((DataBufferInt) originalImage.getRaster().getDataBuffer()).getData();
                 transformedData = ((DataBufferInt)transformedImage.getRaster().getDataBuffer()).getData();
@@ -72,14 +81,21 @@ public class MyImage extends Observable {
         }
 
         public void resetModifiedImage() {
-                ColorModel colorModel = originalImage.getColorModel();
-                boolean isPreMultiplied = originalImage.isAlphaPremultiplied();
-                WritableRaster raster = originalImage.copyData(null);
-                BufferedImage res = new BufferedImage(colorModel, raster, isPreMultiplied, null);
-                modifiedImage = res;
+                System.arraycopy(originalData, 0, modifiedData, 0, originalData.length);
+
+                setChanged();
+                notifyObservers();
+        }
+
+        private void writeModifications() {
+                System.arraycopy(transformedData, 0, modifiedData, 0, transformedData.length);
+                transformationMatrix = Matrix.getIdentityMatrix();
+                inverseMatrix = Matrix.getIdentityMatrix();
         }
 
         public void setSelection(Vector3 a, Vector3 b) {
+                writeModifications();
+
                 Vector3 topL = new Vector3(Math.min(a.x, b.x), Math.min(a.y, b.y), 1);
                 Vector3 botR = new Vector3(Math.max(a.x, b.x), Math.max(a.y, b.y), 1);
                 this.selection = new Selection(topL, botR);
@@ -94,6 +110,7 @@ public class MyImage extends Observable {
 
         public void removeSelection() {
                 selection = null;
+                writeModifications();
 
                 setChanged();
                 notifyObservers();
@@ -123,6 +140,10 @@ public class MyImage extends Observable {
 
         public BufferedImage getBufferedImage() {
                 return originalImage;
+        }
+
+        public Vector3 getImageCenter() {
+                return new Vector3(originalImage.getWidth() / 2, originalImage.getHeight() / 2);
         }
 
         private boolean isInSelection(Vector3 p) {
@@ -195,6 +216,40 @@ public class MyImage extends Observable {
         public void addTransformation(Matrix inverse, Matrix transformation) {
                 this.inverseMatrix = Matrix.multiply(this.inverseMatrix, inverse);
                 this.transformationMatrix = Matrix.multiply(transformation, this.transformationMatrix);
+
+                setChanged();
+                notifyObservers();
+        }
+
+        public BufferedImage getModifiedImage() {
+                return modifiedImage;
+        }
+
+        public BufferedImage getSelectedArea() {
+                BufferedImage selected = modifiedImage.getSubimage(
+                        selection.topL.x,
+                        selection.topL.y,
+                        selection.getWidth(),
+                        selection.getHeight());
+
+                BufferedImage res = new BufferedImage(selected.getWidth(), selected.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                res.getGraphics().drawImage(selected, 0, 0, (img, infoflags, x, y, width, height) -> false);
+
+                return res;
+        }
+
+        public Selection getSelection() {
+                return selection;
+        }
+
+        public void paste(BufferedImage source, int x, int y, int w, int h) {
+                modifiedImage.getGraphics().drawImage(
+                        source,
+                        x,
+                        y,
+                        w,
+                        h,
+                        (img, infoflags, a, b, width, height) -> false);
 
                 setChanged();
                 notifyObservers();

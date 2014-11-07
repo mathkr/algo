@@ -55,7 +55,7 @@ public class ScalingTool extends MouseInputAdapter {
                         } else if (image.hasSelection()) {
                                 pivot = image.getTransformedSelectionCenter();
                         } else {
-                                pivot = new Vector3(0, 0);
+                                pivot = image.getImageCenter();
                         }
 
                         double dxStart = start.x - pivot.x;

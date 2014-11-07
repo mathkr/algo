@@ -28,6 +28,8 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
 public class RotationTool extends MouseInputAdapter {
+        public static final double FACTOR = 0.25;
+
         public Vector3 start;
 
         @Override
@@ -55,10 +57,12 @@ public class RotationTool extends MouseInputAdapter {
                         } else if (image.hasSelection()) {
                                 pivot = image.getTransformedSelectionCenter();
                         } else {
-                                pivot = new Vector3(0, 0);
+                                pivot = image.getImageCenter();
                         }
 
                         double dy = end.y - start.y;
+
+                        int direction = start.x >= pivot.x ? 1 : -1;
 
                         Matrix inverse = Matrix.getIdentityMatrix();
                         Matrix regular = Matrix.getIdentityMatrix();
@@ -66,8 +70,8 @@ public class RotationTool extends MouseInputAdapter {
                         inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(pivot.x, pivot.y));
                         regular = Matrix.multiply(regular, Matrix.getTranslationMatrix(pivot.x, pivot.y));
 
-                        inverse = Matrix.multiply(inverse, Matrix.getRotationMatrix(-dy));
-                        regular = Matrix.multiply(regular, Matrix.getRotationMatrix(dy));
+                        inverse = Matrix.multiply(inverse, Matrix.getRotationMatrix(-dy * direction * FACTOR));
+                        regular = Matrix.multiply(regular, Matrix.getRotationMatrix(dy * direction * FACTOR));
 
                         inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
                         regular = Matrix.multiply(regular, Matrix.getTranslationMatrix(-pivot.x, -pivot.y));
