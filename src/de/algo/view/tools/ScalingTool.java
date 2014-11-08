@@ -64,24 +64,14 @@ public class ScalingTool extends MouseInputAdapter {
                         double dxEnd = end.x - pivot.x;
                         double dyEnd = end.y - pivot.y;
 
-                        double scaleX;
-                        double scaleY;
+                        dxStart = dxStart == 0 ? 1.0 : dxStart;
+                        dyStart = dyStart == 0 ? 1.0 : dyStart;
 
-                        if (dxEnd == 0) {
-                                scaleX = 1.0 / dxStart;
-                        } else if (dxStart == 0) {
-                                scaleX = dxEnd / 1.0;
-                        } else {
-                                scaleX = dxEnd / dxStart;
-                        }
+                        dyEnd = dyEnd == 0 ? 1.0 : dyEnd;
+                        dxEnd = dxEnd == 0 ? 1.0 : dxEnd;
 
-                        if (dyEnd == 0) {
-                                scaleY = 1.0 / dyStart;
-                        } else if (dyStart == 0) {
-                                scaleY = dyEnd / 1.0;
-                        } else {
-                                scaleY = dyEnd / dyStart;
-                        }
+                        double scaleX = dxEnd / dxStart;
+                        double scaleY = dyEnd / dyStart;
 
                         Matrix inverse = Matrix.getIdentityMatrix();
                         Matrix regular = Matrix.getIdentityMatrix();

@@ -114,11 +114,13 @@ public class MyImage extends Observable {
         }
 
         public void removeSelection() {
-                selection = null;
-                writeModifications();
+                if (selection != null) {
+                        selection = null;
+                        writeModifications();
 
-                setChanged();
-                notifyObservers();
+                        setChanged();
+                        notifyObservers();
+                }
         }
 
         public void setPivot(Vector3 pivot) {
@@ -137,10 +139,12 @@ public class MyImage extends Observable {
         }
 
         public void removePivot() {
-                pivot = null;
+                if (pivot != null) {
+                        pivot = null;
 
-                setChanged();
-                notifyObservers();
+                        setChanged();
+                        notifyObservers();
+                }
         }
 
         public BufferedImage getBufferedImage() {

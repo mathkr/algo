@@ -130,17 +130,32 @@ public class MyToolbar extends JToolBar {
 
                 JButton resetImageButton = new JButton(View.getIcon("shapes_remove_icon&24"));
                 resetImageButton.setToolTipText("Reset image");
-                resetImageButton.addActionListener(event -> View.getSelectedCanvas().image.resetModifiedImage());
+                resetImageButton.addActionListener(event ->  {
+                        CanvasPanel canvas = View.getSelectedCanvas();
+                        if (canvas != null) {
+                                canvas.image.resetModifiedImage();
+                        }
+                });
                 add(resetImageButton);
 
                 JButton resetSelectionButton = new JButton(View.getIcon("selection_remove_icon&24"));
                 resetSelectionButton.setToolTipText("Reset selection");
-                resetSelectionButton.addActionListener(event -> View.getSelectedCanvas().image.removeSelection());
+                resetSelectionButton.addActionListener(event ->  {
+                        CanvasPanel canvas = View.getSelectedCanvas();
+                        if (canvas != null) {
+                                canvas.image.removeSelection();
+                        }
+                });
                 add(resetSelectionButton);
 
                 JButton resetPivotButton = new JButton(View.getIcon("target_remove_icon&24"));
                 resetPivotButton.setToolTipText("Reset pivot");
-                resetPivotButton.addActionListener(event -> View.getSelectedCanvas().image.removePivot());
+                resetPivotButton.addActionListener(event ->  {
+                        CanvasPanel canvas = View.getSelectedCanvas();
+                        if (canvas != null) {
+                                canvas.image.removePivot();
+                        }
+                });
                 add(resetPivotButton);
         }
 
