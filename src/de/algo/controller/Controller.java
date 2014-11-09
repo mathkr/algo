@@ -20,6 +20,7 @@
 package de.algo.controller;
 
 import de.algo.model.Model;
+import de.algo.model.MyImage;
 import de.algo.util.Logger;
 import de.algo.util.Timer;
 import de.algo.view.InfoBar;
@@ -28,6 +29,9 @@ import de.algo.view.View;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -120,5 +124,63 @@ public class Controller {
                         file.isFile() &&
                         file.canRead() &&
                         view.FILEFILTER.accept(file);
+        }
+
+        public void createHistogram(MyImage image, File file) {
+                if (!file.exists()) {
+                        try {
+                                file.createNewFile();
+                                Logger.log(Logger.INFO, "Created file '" + file.getPath() + "'");
+                        } catch (IOException e) {
+                                e.printStackTrace();
+                                String msg = "Could not create file '" + file.getPath() + "'";
+                                JOptionPane.showMessageDialog(view.MAIN_FRAME, msg, "", JOptionPane.ERROR_MESSAGE);
+                                Logger.log(Logger.ERROR, msg);
+                        }
+                }
+
+                if (!file.canWrite()) {
+                        String msg = "Could not write to file '" + file.getPath() + "': No Permission.";
+                        JOptionPane.showMessageDialog(view.MAIN_FRAME, msg, "No Permission", JOptionPane.ERROR_MESSAGE);
+                        Logger.log(Logger.ERROR, msg);
+                        return;
+                }
+
+                new Thread(() -> {
+                        Map<Integer, Integer> colors = new HashMap<>();
+
+                        for (int i = 0; i < image.modifiedData.length; ++i) {
+                                int count = colors.getOrDefault(image.modifiedData[i], 0);
+                                colors.put(image.modifiedData[i], count + 1);
+                        }
+
+                        Map<Integer, Integer> sorted = new TreeMap<>((a, b) -> colors.get(b).compareTo(colors.get(a)));
+                        sorted.putAll(colors);
+
+                        StringBuilder sb = new StringBuilder();
+
+                        for (Map.Entry<Integer, Integer> entry : sorted.entrySet()) {
+                                sb.append(String.format("%-10x", entry.getKey()));
+                                sb.append(": ");
+                                sb.append(entry.getValue());
+                                sb.append('\n');
+                        }
+
+                        PrintWriter out = null;
+                        try {
+                                out = new PrintWriter(file);
+                                out.print(sb);
+                                out.flush();
+                        } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                        } finally {
+                                if (out != null) {
+                                        out.close();
+                                }
+                        }
+
+                        SwingUtilities.invokeLater(() -> InfoBar.publish("Wrote histogram for '"
+                                + image.IDENTIFIER + "' to file '" + file.getName() + "'"));
+                }).start();
         }
 }

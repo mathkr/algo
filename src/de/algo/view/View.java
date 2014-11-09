@@ -39,7 +39,7 @@ public class View implements Observer {
         private Controller controller;
         private Model model;
 
-        private JFileChooser fileChooser;
+        private JFileChooser imageChooser;
         private SelectDialog slideshowSelectDialog;
 
         public final MainFrame MAIN_FRAME;
@@ -57,15 +57,16 @@ public class View implements Observer {
                 MAIN_FRAME = new MainFrame();
 
                 FILEFILTER = new FileNameExtensionFilter("JPG and GIF Images", "jpg", "jpeg", "gif");
-                fileChooser = new JFileChooser(".");
-                fileChooser.setMultiSelectionEnabled(true);
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                fileChooser.setFileFilter(FILEFILTER);
+                imageChooser = new JFileChooser(".");
+                imageChooser.setMultiSelectionEnabled(true);
+                imageChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                imageChooser.setFileFilter(FILEFILTER);
 
                 slideshowSelectDialog = new SelectDialog(MAIN_FRAME, new ImageSelectorPanel(200, 3, 10, true));
 
                 addListeners();
 
+                MAIN_FRAME.setExtendedState(MAIN_FRAME.getExtendedState() | JFrame.MAXIMIZED_BOTH);
                 MAIN_FRAME.pack();
                 MAIN_FRAME.setVisible(true);
         }
@@ -100,6 +101,43 @@ public class View implements Observer {
 
                 MAIN_FRAME.MENUITEM_OPENIMG.addActionListener(event -> openFiles());
                 MAIN_FRAME.MENUITEM_EXIT.addActionListener(event -> controller.exit());
+
+                MAIN_FRAME.MENUITEM_HISTO.addActionListener(event -> {
+                        if (model.loadedImages.isEmpty()) {
+                                JOptionPane.showMessageDialog(MAIN_FRAME,
+                                        "No images have been opened. Select File -> Open images..");
+                        } else if (getSelectedCanvas() == null) {
+                                JOptionPane.showMessageDialog(MAIN_FRAME,
+                                        "Select an image for editing before outputting its histogram.");
+                        } else {
+                                JFileChooser chooser = new JFileChooser(".");
+                                chooser.setMultiSelectionEnabled(false);
+                                chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                                chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+                                
+                                final int result = chooser.showDialog(MAIN_FRAME, "Create histogram");
+
+                                if (result == JFileChooser.APPROVE_OPTION) {
+                                        File file = chooser.getSelectedFile();
+
+                                        if (file.exists()) {
+                                                final int overWrite = JOptionPane.showConfirmDialog(MAIN_FRAME,
+                                                        "Really overwrite existing file '" + file.getName() + "'?",
+                                                        "Overwrite file?",
+                                                        JOptionPane.YES_NO_OPTION);
+
+                                                if (overWrite == JOptionPane.OK_OPTION) {
+                                                        controller.createHistogram(
+                                                                getSelectedCanvas().image,
+                                                                file);
+                                                }
+                                        } else {
+                                                controller.createHistogram(getSelectedCanvas().image, file);
+                                        }
+                                }
+                        }
+
+                });
 
                 MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
                         if (model.loadedImages.isEmpty()) {
@@ -160,9 +198,9 @@ public class View implements Observer {
         }
 
         private void openFiles() {
-                final int result = fileChooser.showOpenDialog(MAIN_FRAME);
+                final int result = imageChooser.showOpenDialog(MAIN_FRAME);
                 if (result == JFileChooser.APPROVE_OPTION) {
-                        File[] files = fileChooser.getSelectedFiles();
+                        File[] files = imageChooser.getSelectedFiles();
                         controller.processSelectedFiles(files);
                 }
         }
@@ -186,8 +224,7 @@ public class View implements Observer {
                                                    int iWidth, int iHeight, int margin)
         {
                 double aspectRatio = (double) iWidth / (double) iHeight;
-
-                width -= margin;
+ width -= margin;
                 height -= margin;
 
                 int x, y, w, h;

@@ -1,14 +1,14 @@
 package de.algo.model;
 
-public class Pixel extends Vector3 {
+public class ColorVector3 extends Vector3 {
         public int pixel;
 
-        public Pixel(Vector3 vector, int pixel) {
+        public ColorVector3(Vector3 vector, int pixel) {
                 super(vector);
                 this.pixel = pixel;
         }
 
-        public Pixel(int x, int y, int pixel) {
+        public ColorVector3(int x, int y, int pixel) {
                 super(x, y);
                 this.pixel = pixel;
         }

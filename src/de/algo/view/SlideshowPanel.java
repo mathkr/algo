@@ -19,6 +19,7 @@
 
 package de.algo.view;
 
+import de.algo.model.Blend;
 import de.algo.model.MyImage;
 
 import javax.swing.*;
@@ -99,15 +100,8 @@ public class SlideshowPanel extends JPanel {
                 MyImage curr = scaledImages.get(currentImage);
                 MyImage next = scaledImages.get((currentImage + 1) >= scaledImages.size() ? 0 : currentImage + 1);
                 for (int i = 0; i < buffer.originalData.length; ++i) {
-                        int r = blendSingle((curr.originalData[i] >> 16) & 0xFF, (next.originalData[i] >> 16) & 0xFF, transitionPercent);
-                        int g = blendSingle((curr.originalData[i] >> 8 ) & 0xFF, (next.originalData[i] >> 8 ) & 0xFF, transitionPercent);
-                        int b = blendSingle( curr.originalData[i]        & 0xFF,  next.originalData[i]        & 0xFF, transitionPercent);
-                        buffer.originalData[i] = 0xFF << 24 | r << 16 | g << 8 | b;
+                        buffer.originalData[i] = Blend.blendPixel(curr.originalData[i], next.originalData[i], transitionPercent);
                 }
-        }
-
-        private int blendSingle(int a, int b, int transitionPercent) {
-                return a + (b - a) * transitionPercent / 100;
         }
 
         private void scaleImages() {

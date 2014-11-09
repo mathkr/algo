@@ -120,13 +120,43 @@ public class MyToolbar extends JToolBar {
 
                 add(Box.createVerticalStrut(20));
 
+                ColorButton colorButtonPrimary = new ColorButton(
+                        ColorButton.PRIMARY,
+                        Color.BLACK,
+                        "Primary color");
+                add(colorButtonPrimary);
+
+                ColorButton colorButtonSecondary = new ColorButton(
+                        ColorButton.SECONDARY,
+                        Color.LIGHT_GRAY,
+                        "Secondary color");
+                add(colorButtonSecondary);
+
+                add(Box.createVerticalStrut(20));
+
                 ToolButton lineButton = new ToolButton(
                         new LineTool(),
-                        View.getIcon("pencil_icon&24"),
+                        View.getIcon("line_icon&24"),
                         "Line tool",
                         Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 lineButton.addActionListener(select);
                 add(lineButton);
+
+                ToolButton circleButton = new ToolButton(
+                        new CircleTool(),
+                        View.getIcon("round_line_icon&24"),
+                        "Circle tool",
+                        Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                circleButton.addActionListener(select);
+                add(circleButton);
+
+                ToolButton filledCircleTool = new ToolButton(
+                        new FilledCircleTool(),
+                        View.getIcon("round_icon&24"),
+                        "Filled circle tool",
+                        Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                filledCircleTool.addActionListener(select);
+                add(filledCircleTool);
 
                 selectedTool = cursorButton;
                 selectedTool.setActive(true);

@@ -1,9 +1,10 @@
 package de.algo.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bresenham {
-        public static void drawLine(Vector3 beg, Vector3 end, List<Pixel> points) {
+        public static void drawLine(Vector3 beg, Vector3 end, MyImage image, int colorA, int colorB) {
                 final int dx = Math.abs(beg.x - end.x);
                 final int dy = Math.abs(beg.y - end.y);
 
@@ -35,7 +36,7 @@ public class Bresenham {
                 int y = beg.y;
 
                 for (int i = 0; i <= distLong; ++i) {
-                        points.add(new Pixel(x, y, 0));
+                        setPixel(image, x, y, Blend.blendPixel(colorA, colorB, (i * 100) / distLong));
 
                         x += xIncLong;
                         y += yIncLong;
@@ -46,6 +47,108 @@ public class Bresenham {
                                 x += xIncShort;
                                 y += yIncShort;
                         }
+                }
+        }
+
+        public static void drawCircle(Vector3 p, int r, MyImage image, int colorA, int colorB) {
+                int y = 0;
+                int x = r;
+                int F = -r;
+
+                int dy = 1;
+                int dyx = -2 * r + 3;
+
+                List<Vector3> section = new ArrayList<>();
+                while (y <= x) {
+                        section.add(new Vector3(x, y));
+
+                        ++y;
+                        dy += 2;
+                        dyx += 2;
+
+                        if (F > 0) {
+                                F += dyx;
+                                --x;
+                                dyx += 2;
+                        } else {
+                                F += dy;
+                        }
+                }
+                setCirclePixels(image, p, section, colorA, colorB);
+        }
+
+        public static void drawFilledCircle(Vector3 p, int r, MyImage image, int colorA, int colorB) {
+                int y = 0;
+                int x = r;
+                int F = -r;
+
+                int dy = 1;
+                int dyx = -2 * r + 3;
+
+                while (y <= x) {
+                        setFilledCirclePixels(image, p, x, y, colorA, colorB, r);
+
+                        ++y;
+                        dy += 2;
+                        dyx += 2;
+
+                        if (F > 0) {
+                                F += dyx;
+                                --x;
+                                dyx += 2;
+                        } else {
+                                F += dy;
+                        }
+                }
+        }
+
+        public static void setCirclePixels(MyImage image, Vector3 p, List<Vector3> section, int colorA, int colorB) {
+                int i = 0;
+
+                for (int j = 0; j < section.size(); ++j, ++i) {
+                        Vector3 v = section.get(i);
+                        int percent = (i * 100) / section.size();
+                        int color = Blend.blendPixel(colorA, colorB, percent);
+
+                        setPixel(image, p.x + v.x, p.y + v.y, color);
+                        setPixel(image, p.x - v.x, p.y + v.y, color);
+                        setPixel(image, p.x + v.x, p.y - v.y, color);
+                        setPixel(image, p.x - v.x, p.y - v.y, color);
+
+                        setPixel(image, p.x + v.y, p.y + v.x, color);
+                        setPixel(image, p.x - v.y, p.y + v.x, color);
+                        setPixel(image, p.x + v.y, p.y - v.x, color);
+                        setPixel(image, p.x - v.y, p.y - v.x, color);
+                }
+        }
+
+        private static void setPixel(MyImage image, int x, int y, int color) {
+                if (image.isInBounds(x, y)) {
+                        image.shapesData[image.coordsToDataIndex(x, y)] = color;
+                }
+        }
+
+        public static void setFilledCirclePixels(MyImage image, Vector3 p, int x, int y, int colorA, int colorB, int radius) {
+                for (int i = 0; i <= x; ++i) {
+                        int dist = (int) Math.sqrt(Math.pow(i, 2.0) + Math.pow(y, 2.0));
+                        int color = Blend.blendPixel(colorA, colorB, (dist * 100) / radius);
+
+                        setPixel(image, p.x +  i, p.y + y, color);
+                        setPixel(image, p.x -  i, p.y + y, color);
+
+                        setPixel(image, p.x + i, p.y - y, color);
+                        setPixel(image, p.x - i, p.y - y, color);
+                }
+
+                for (int i = 0; i <= y; ++i) {
+                        int dist = (int) Math.sqrt(Math.pow(i, 2.0) + Math.pow(x, 2.0));
+                        int color = Blend.blendPixel(colorA, colorB, (dist * 100) / radius);
+
+                        setPixel(image, p.x + i, p.y + x, color);
+                        setPixel(image, p.x - i, p.y + x, color);
+
+                        setPixel(image, p.x + i, p.y - x, color);
+                        setPixel(image, p.x - i, p.y - x, color);
                 }
         }
 }

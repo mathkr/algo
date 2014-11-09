@@ -35,6 +35,9 @@ public class MainFrame extends JFrame {
         public final JMenuItem MENUITEM_OPENIMG;
         public final JMenuItem MENUITEM_EXIT;
 
+        public final JMenu MENU_HISTO;
+        public final JMenuItem MENUITEM_HISTO;
+
         public final JMenu MENU_VIEW;
         public final JMenuItem MENUITEM_SLIDESHOW;
 
@@ -68,11 +71,16 @@ public class MainFrame extends JFrame {
                 MENU_FILE.add(MENUITEM_OPENIMG);
                 MENU_FILE.add(MENUITEM_EXIT);
 
+                MENU_HISTO = new JMenu("Histogram");
+                MENUITEM_HISTO = new JMenuItem("Create histogram..");
+                MENU_HISTO.add(MENUITEM_HISTO);
+
                 MENU_VIEW = new JMenu("View");
                 MENUITEM_SLIDESHOW = new JMenuItem("Start slideshow..");
                 MENU_VIEW.add(MENUITEM_SLIDESHOW);
 
                 MENUBAR.add(MENU_FILE);
+                MENUBAR.add(MENU_HISTO);
                 MENUBAR.add(MENU_VIEW);
                 setJMenuBar(MENUBAR);
         }

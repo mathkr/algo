@@ -36,12 +36,15 @@ public class MyImage extends Observable {
         private BufferedImage modifiedImage;
         public int[] modifiedData;
 
+        private BufferedImage shapesImage;
+        public int[] shapesData;
+
         private Matrix inverseMatrix;
         private Matrix transformationMatrix;
 
         private Selection selection;
         private Vector3 pivot;
-        private List<Pixel> tempPixels;
+        private List<ColorVector3> tempPixels;
 
         public MyImage(String identifier, Image source) {
                 this.IDENTIFIER = identifier;
@@ -73,10 +76,12 @@ public class MyImage extends Observable {
                 }
 
                 transformedImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                shapesImage = new BufferedImage(originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
                 originalData = ((DataBufferInt) originalImage.getRaster().getDataBuffer()).getData();
-                transformedData = ((DataBufferInt)transformedImage.getRaster().getDataBuffer()).getData();
                 modifiedData = ((DataBufferInt)modifiedImage.getRaster().getDataBuffer()).getData();
+                transformedData = ((DataBufferInt)transformedImage.getRaster().getDataBuffer()).getData();
+                shapesData = ((DataBufferInt)shapesImage.getRaster().getDataBuffer()).getData();
 
                 inverseMatrix = Matrix.getIdentityMatrix();
                 transformationMatrix = Matrix.getIdentityMatrix();
@@ -172,12 +177,21 @@ public class MyImage extends Observable {
                         && p.y < originalImage.getHeight();
         }
 
+        public boolean isInBounds(int x, int y) {
+                return     x >= 0
+                        && y >= 0
+                        && x < originalImage.getWidth()
+                        && y < originalImage.getHeight();
+        }
+
         public BufferedImage getTransformedImage() {
                 for (int i = 0; i < transformedData.length; ++i) {
                         Vector3 point = dataIndexToCoords(i);
                         Vector3 transformedPoint = Matrix.multiply(inverseMatrix, point);
 
-                        if (isInSelection(transformedPoint)) {
+                        if (shapesData[i] != 0) {
+                                transformedData[i] = shapesData[i];
+                        } else if (isInSelection(transformedPoint)) {
                                 transformedData[i] = modifiedData[coordsToDataIndex(transformedPoint)];
                         } else if (isInSelection(point)) {
                                 transformedData[i] = 0xFFFFFFFF;
@@ -219,15 +233,19 @@ public class MyImage extends Observable {
                 return Matrix.multiply(transformationMatrix, selection.getCenter());
         }
 
-        private Vector3 dataIndexToCoords(int index) {
+        public Vector3 dataIndexToCoords(int index) {
                 int x = index % originalImage.getWidth();
                 int y = index / originalImage.getWidth();
 
                 return new Vector3(x, y);
         }
 
-        private int coordsToDataIndex(Vector3 p) {
+        public int coordsToDataIndex(Vector3 p) {
                 return p.y * originalImage.getWidth() + p.x;
+        }
+
+        public int coordsToDataIndex(int x, int y) {
+                return y * originalImage.getWidth() + x;
         }
 
         public void addTransformation(Matrix inverse, Matrix transformation) {
@@ -268,23 +286,20 @@ public class MyImage extends Observable {
                 notifyObservers();
         }
 
-        public void setTempPixels(List<Pixel> tempPixels) {
-                this.tempPixels = tempPixels;
+        public void applyShapes(boolean temporary) {
+                if (!temporary) {
+                        writeModifications();
+
+                        clearShapes();
+                }
 
                 setChanged();
                 notifyObservers();
         }
 
-        public void applyPixels(List<Pixel> pixels) {
-                pixels.forEach(pixel -> {
-                        if (isInBounds(pixel)) {
-                                modifiedData[coordsToDataIndex(pixel)] = pixel.pixel;
-                        }
-                });
-
-                tempPixels = null;
-
-                setChanged();
-                notifyObservers();
+        public void clearShapes() {
+                for (int i = 0; i < shapesData.length; ++i) {
+                        shapesData[i] = 0;
+                }
         }
 }
