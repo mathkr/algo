@@ -40,7 +40,7 @@ public class CanvasPanel extends JPanel implements Observer {
 
                 float[] dash = { 5f, 5f };
                 setBackground(Color.DARK_GRAY);
-                selectionStroke = new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1f, dash, 0f);
+                selectionStroke = new BasicStroke(2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1f, dash, 0f);
 
                 image.addObserver(this);
 
@@ -141,8 +141,9 @@ public class CanvasPanel extends JPanel implements Observer {
 
         private void paintPivot(Graphics g, Vector3 pivot) {
                 Graphics2D g2d = (Graphics2D)g;
-                //g2d.setXORMode(Color.LIGHT_GRAY);
-                g2d.setColor(Color.RED);
+                g2d.setColor(Color.BLACK);
+                g2d.setXORMode(Color.GRAY);
+                //g2d.setColor(Color.RED);
                 g2d.setStroke(new BasicStroke(2f));
 
                 int w = 18;
@@ -154,8 +155,9 @@ public class CanvasPanel extends JPanel implements Observer {
         private void paintSelection(Graphics g, int[][] selection) {
                 Graphics2D g2d = (Graphics2D)g;
                 g2d.setStroke(selectionStroke);
-                //g2d.setXORMode(Color.LIGHT_GRAY);
-                g2d.setColor(Color.RED);
+                g2d.setColor(Color.BLACK);
+                g2d.setXORMode(Color.BLACK);
+                //g2d.setColor(Color.RED);
                 g2d.drawPolygon(selection[0], selection[1], 4);
         }
 }
