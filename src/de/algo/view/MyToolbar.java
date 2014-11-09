@@ -22,12 +22,16 @@ package de.algo.view;
 import de.algo.view.tools.*;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
+import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class MyToolbar extends JToolBar {
         private ToolButton selectedTool;
+        private ChangeListener changeListener;
 
         public MyToolbar() {
                 super(JToolBar.VERTICAL);
@@ -42,12 +46,17 @@ public class MyToolbar extends JToolBar {
                         }
                         newButton.setActive(true);
                         selectedTool = newButton;
+
+                        if (changeListener != null) {
+                                changeListener.stateChanged(new ChangeEvent(this));
+                        }
                 };
 
                 ToolButton cursorButton = new ToolButton(
                         new MouseInputAdapter() {},
                         View.getIcon("cursor_arrow_icon&24"),
-                        "Cursor tool");
+                        "Cursor tool",
+                        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 cursorButton.addActionListener(select);
                 add(cursorButton);
 
@@ -56,49 +65,56 @@ public class MyToolbar extends JToolBar {
                 ToolButton selectionButton = new ToolButton(
                         new SelectionTool(),
                         View.getIcon("selection_icon&24"),
-                        "Selection tool");
+                        "Selection tool",
+                        Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 selectionButton.addActionListener(select);
                 add(selectionButton);
 
                 ToolButton pivotButton = new ToolButton(
                         new PivotTool(),
                         View.getIcon("target_icon&24"),
-                        "Pivot tool");
+                        "Pivot tool",
+                        Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 pivotButton.addActionListener(select);
                 add(pivotButton);
 
                 ToolButton translateButton = new ToolButton(
                         new TranslationTool(),
                         View.getIcon("cursor_drag_arrow_icon&24"),
-                        "Translation tool");
+                        "Translation tool",
+                        Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
                 translateButton.addActionListener(select);
                 add(translateButton);
 
                 ToolButton scaleButton = new ToolButton(
                         new ScalingTool(),
-                        View.getIcon("arrow_two_head_icon&24"),
-                        "Scale tool");
+                        View.getIcon("expand_icon&24"),
+                        "Scale tool",
+                        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 scaleButton.addActionListener(select);
                 add(scaleButton);
 
                 ToolButton rotateButton = new ToolButton(
                         new RotationTool(),
                         View.getIcon("reload_icon&24"),
-                        "Rotation tool");
+                        "Rotation tool",
+                        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 rotateButton.addActionListener(select);
                 add(rotateButton);
 
                 ToolButton shearXButton = new ToolButton(
                         new ShearingTool(true),
                         View.getIcon("shear_icon&24"),
-                        "X-Shear tool");
+                        "X-Shear tool",
+                        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 shearXButton.addActionListener(select);
                 add(shearXButton);
 
                 ToolButton shearYButton = new ToolButton(
                         new ShearingTool(false),
                         View.getIcon("shear_y_icon&24"),
-                        "Y-Shear tool");
+                        "Y-Shear tool",
+                        Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 shearYButton.addActionListener(select);
                 add(shearYButton);
 
@@ -107,7 +123,8 @@ public class MyToolbar extends JToolBar {
                 ToolButton lineButton = new ToolButton(
                         new LineTool(),
                         View.getIcon("pencil_icon&24"),
-                        "Line tool");
+                        "Line tool",
+                        Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
                 lineButton.addActionListener(select);
                 add(lineButton);
 
@@ -161,5 +178,13 @@ public class MyToolbar extends JToolBar {
 
         public MouseInputListener getMouseListener() {
                 return selectedTool.getTool();
+        }
+
+        public void addChangeListener(ChangeListener listener) {
+                this.changeListener = listener;
+        }
+
+        public Cursor getToolCursor() {
+                return selectedTool.getToolCursor();
         }
 }

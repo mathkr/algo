@@ -26,10 +26,12 @@ import java.awt.*;
 public class ToolButton extends JButton {
         private MouseInputListener tool;
         private Color defaultBackground;
+        private Cursor cursor;
 
-        public ToolButton(MouseInputListener tool, ImageIcon icon, String tooltip) {
+        public ToolButton(MouseInputListener tool, ImageIcon icon, String tooltip, Cursor cursor) {
                 super();
 
+                this.cursor = cursor;
                 this.tool = tool;
                 this.defaultBackground = getBackground();
 
@@ -44,6 +46,10 @@ public class ToolButton extends JButton {
 
         public MouseInputListener getTool() {
                 return tool;
+        }
+
+        public Cursor getToolCursor() {
+                return cursor;
         }
 
         public void setActive(boolean active) {

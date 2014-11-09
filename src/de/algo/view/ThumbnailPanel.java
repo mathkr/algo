@@ -41,8 +41,8 @@ public class ThumbnailPanel extends JPanel {
                 int iHeight = image.getBufferedImage().getHeight(this);
 
                 BufferedImage buffer = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-                View.drawImageCentered(image.getBufferedImage(), buffer.getGraphics(),
-                        size, size, iWidth, iHeight);
+                View.drawImageCenteredMargin(image.getBufferedImage(), buffer.getGraphics(),
+                        size, size, iWidth, iHeight, 20);
                 this.image = new MyImage(image.IDENTIFIER, buffer);
 
                 setBackground(Color.DARK_GRAY);
@@ -59,6 +59,8 @@ public class ThumbnailPanel extends JPanel {
                                 }
                         }
                 });
+
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
 
         @Override
@@ -69,14 +71,20 @@ public class ThumbnailPanel extends JPanel {
 
                 if (selected) {
                         Graphics2D g2d = (Graphics2D)g;
-                        g2d.setStroke(new BasicStroke(10));
-                        g2d.setColor(Color.BLUE);
-                        g.drawRect(0, 0, getWidth(), getHeight());
+                        g2d.setStroke(new BasicStroke(3));
+                        g2d.setColor(Color.WHITE);
+                        g.drawRect(3, 3, getWidth() - 7, getHeight() - 7);
                 }
         }
 
         public void setSelected(boolean selected) {
                 this.selected = selected;
+
+                if (selected) {
+                        setBackground(Color.GRAY);
+                } else {
+                        setBackground(Color.DARK_GRAY);
+                }
         }
 
         public boolean isSelected() {

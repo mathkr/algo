@@ -179,25 +179,34 @@ public class View implements Observer {
         }
 
         public static void drawImageCentered(Image img, Graphics g, int width, int height, int iWidth, int iHeight) {
+                drawImageCenteredMargin(img, g, width, height, iWidth, iHeight, 0);
+        }
+
+        public static void drawImageCenteredMargin(Image img, Graphics g, int width, int height,
+                                                   int iWidth, int iHeight, int margin)
+        {
                 double aspectRatio = (double) iWidth / (double) iHeight;
+
+                width -= margin;
+                height -= margin;
 
                 int x, y, w, h;
 
                 if (iWidth < width && iHeight < height) {
                         w = iWidth;
                         h = iHeight;
-                        x = (width - iWidth) / 2;
-                        y = (height - iHeight) / 2;
+                        x = (width - iWidth) / 2 + margin / 2;
+                        y = (height - iHeight) / 2 + margin / 2;
                 } else if (aspectRatio >= 1.0) {
                         w = width;
                         h = (int)(width / aspectRatio);
-                        x = 0;
-                        y = (height - h) / 2;
+                        x = margin / 2;
+                        y = (height - h) / 2 + margin / 2;
                 } else {
                         h = height;
                         w = (int)(h * aspectRatio);
-                        x = (width - w) / 2;
-                        y = 0;
+                        x = (width - w) / 2 + margin / 2;
+                        y = margin / 2;
                 }
 
                 g.drawImage(img, x, y, w, h, (im ,i, a, b, c, d) -> false);

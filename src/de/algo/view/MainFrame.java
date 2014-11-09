@@ -51,7 +51,7 @@ public class MainFrame extends JFrame {
                 TOOLBAR = new MyToolbar();
                 CANVASAREA.add(TOOLBAR, BorderLayout.WEST);
 
-                GALLERY = new ImageSelectorPanel(300, 1, 10, false);
+                GALLERY = new ImageSelectorPanel(250, 1, 10, false);
                 GALLERYAREA = new GalleryPanel(GALLERY);
 
                 add(CANVASAREA, BorderLayout.CENTER);

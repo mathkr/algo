@@ -44,6 +44,10 @@ public class CanvasPanel extends JPanel implements Observer {
 
                 image.addObserver(this);
 
+                toolbar.addChangeListener(e -> {
+                        setCursor(toolbar.getToolCursor());
+                });
+
                 addMouseMotionListener(new MouseAdapter() {
                         @Override
                         public void mouseDragged(MouseEvent e) {
