@@ -38,6 +38,7 @@ public class LineTool extends MouseInputAdapter {
         @Override
         public void mouseReleased(MouseEvent e) {
                 line(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, false);
+                start = null;
         }
 
         @Override

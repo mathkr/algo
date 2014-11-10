@@ -28,6 +28,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 
 public class MyToolbar extends JToolBar {
         private ToolButton selectedTool;
@@ -126,11 +127,23 @@ public class MyToolbar extends JToolBar {
                         "Primary color");
                 add(colorButtonPrimary);
 
+                JButton toggleGradient = new JButton(View.getIcon("gradient_icon&24"));
+                JCheckBox gradientCheckbox = new JCheckBox();
+                gradientCheckbox.setPreferredSize(new Dimension(32, 32));
+                add(toggleGradient);
+
                 ColorButton colorButtonSecondary = new ColorButton(
                         ColorButton.SECONDARY,
                         Color.LIGHT_GRAY,
                         "Secondary color");
+                colorButtonSecondary.setEnabled(false);
                 add(colorButtonSecondary);
+
+                gradientCheckbox.addItemListener(
+                        e -> colorButtonSecondary.setEnabled(e.getStateChange() == ItemEvent.SELECTED));
+
+                toggleGradient.addActionListener(
+                        e -> colorButtonSecondary.setEnabled(!colorButtonSecondary.isEnabled()));
 
                 add(Box.createVerticalStrut(20));
 

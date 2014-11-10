@@ -40,13 +40,11 @@ public class CanvasPanel extends JPanel implements Observer {
 
                 float[] dash = { 5f, 5f };
                 setBackground(Color.DARK_GRAY);
-                selectionStroke = new BasicStroke(2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1f, dash, 0f);
+                selectionStroke = new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1f, dash, 0f);
 
                 image.addObserver(this);
 
-                toolbar.addChangeListener(e -> {
-                        setCursor(toolbar.getToolCursor());
-                });
+                toolbar.addChangeListener(e -> setCursor(toolbar.getToolCursor()));
 
                 addMouseMotionListener(new MouseAdapter() {
                         @Override
@@ -72,92 +70,90 @@ public class CanvasPanel extends JPanel implements Observer {
                         }
 
                         @Override
-                        public void mouseReleased(MouseEvent e) {
+                        public void mouseReleased (MouseEvent e) {
                                 toolbar.getMouseListener().mouseReleased(translateMouseEvent(e));
                         }
 
                         @Override
-                        public void mouseEntered(MouseEvent e) {
+                        public void mouseEntered (MouseEvent e) {
                                 toolbar.getMouseListener().mouseEntered(translateMouseEvent(e));
                         }
 
                         @Override
-                        public void mouseExited(MouseEvent e) {
+                        public void mouseExited (MouseEvent e) {
                                 toolbar.getMouseListener().mouseExited(translateMouseEvent(e));
                         }
                 });
         }
 
-        private MouseEvent translateMouseEvent(MouseEvent e) {
-                return new MouseEvent(
-                        (Component)e.getSource(),
-                        e.getID(),
-                        e.getWhen(),
-                        e.getModifiers(),
-                        e.getX() - xTranslation,
-                        e.getY() - yTranslation,
-                        e.getClickCount(),
-                        e.isPopupTrigger());
-        }
+                        private MouseEvent translateMouseEvent(MouseEvent e) {
+                                return new MouseEvent(
+                                        (Component) e.getSource(),
+                                        e.getID(),
+                                        e.getWhen(),
+                                        e.getModifiers(),
+                                        e.getX() - xTranslation,
+                                        e.getY() - yTranslation,
+                                        e.getClickCount(),
+                                        e.isPopupTrigger());
+                        }
 
-        private void setTranslation(Graphics g) {
-                if (image.getBufferedImage().getWidth() < getWidth()) {
-                        xTranslation = (getWidth() - image.getBufferedImage().getWidth()) / 2;
+                        private void setTranslation(Graphics g) {
+                                if (image.getBufferedImage().getWidth() < getWidth()) {
+                                        xTranslation = (getWidth() - image.getBufferedImage().getWidth()) / 2;
+                                }
+
+                                if (image.getBufferedImage().getHeight() < getHeight()) {
+                                        yTranslation = (getHeight() - image.getBufferedImage().getHeight()) / 2;
+                                }
+                        }
+
+                        @Override
+                        public Dimension getPreferredSize() {
+                                return new Dimension(image.getBufferedImage().getWidth(),
+                                        image.getBufferedImage().getHeight());
+                        }
+
+                        @Override
+                        public void update(Observable o, Object arg) {
+                                repaint();
+                        }
+
+                        @Override
+                        protected void paintComponent(Graphics g) {
+                                super.paintComponent(g);
+
+                                setTranslation(g);
+                                g.translate(xTranslation, yTranslation);
+
+                                g.drawImage(image.transformedImage, 0, 0, this);
+
+                                if (image.hasSelection()) {
+                                        paintSelection(g, image.getTransformedSelection());
+                                }
+
+                                if (image.hasPivot()) {
+                                        paintPivot(g, image.getPivot());
+                                }
+                        }
+
+                        private void paintPivot(Graphics g, Vector3 pivot) {
+                                Graphics2D g2d = (Graphics2D) g;
+                                g2d.setColor(Color.WHITE);
+                                g2d.setXORMode(Color.BLACK);
+                                g2d.setStroke(new BasicStroke(2f));
+
+                                int w = 18;
+                                g.drawLine(pivot.x - w / 2, pivot.y, pivot.x + w / 2, pivot.y);
+                                g.drawLine(pivot.x, pivot.y - w / 2, pivot.x, pivot.y + w / 2);
+                                g.drawOval(pivot.x - w / 2, pivot.y - w / 2, w, w);
+                        }
+
+                        private void paintSelection(Graphics g, int[][] selection) {
+                                Graphics2D g2d = (Graphics2D) g;
+                                g2d.setStroke(selectionStroke);
+                                g2d.setColor(Color.WHITE);
+                                g2d.setXORMode(Color.BLACK);
+                                g2d.drawPolygon(selection[0], selection[1], 4);
+                        }
                 }
-
-                if (image.getBufferedImage().getHeight() < getHeight()) {
-                        yTranslation = (getHeight() - image.getBufferedImage().getHeight()) / 2;
-                }
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-                return new Dimension(image.getBufferedImage().getWidth(),
-                        image.getBufferedImage().getHeight());
-        }
-
-        @Override
-        public void update(Observable o, Object arg) {
-                repaint();
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                setTranslation(g);
-                g.translate(xTranslation, yTranslation);
-
-                g.drawImage(image.getTransformedImage(), 0, 0, this);
-
-                if (image.hasSelection()) {
-                        paintSelection(g, image.getTransformedSelection());
-                }
-
-                if (image.hasPivot()) {
-                        paintPivot(g, image.getPivot());
-                }
-        }
-
-        private void paintPivot(Graphics g, Vector3 pivot) {
-                Graphics2D g2d = (Graphics2D)g;
-                g2d.setColor(Color.BLACK);
-                g2d.setXORMode(Color.GRAY);
-                //g2d.setColor(Color.RED);
-                g2d.setStroke(new BasicStroke(2f));
-
-                int w = 18;
-                g.drawLine(pivot.x - w / 2, pivot.y, pivot.x + w / 2, pivot.y);
-                g.drawLine(pivot.x, pivot.y - w / 2, pivot.x, pivot.y + w / 2);
-                g.drawOval(pivot.x - w / 2, pivot.y - w / 2, w, w);
-        }
-
-        private void paintSelection(Graphics g, int[][] selection) {
-                Graphics2D g2d = (Graphics2D)g;
-                g2d.setStroke(selectionStroke);
-                g2d.setColor(Color.BLACK);
-                g2d.setXORMode(Color.BLACK);
-                //g2d.setColor(Color.RED);
-                g2d.drawPolygon(selection[0], selection[1], 4);
-        }
-}

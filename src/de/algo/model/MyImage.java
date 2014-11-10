@@ -22,7 +22,6 @@ package de.algo.model;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
-import java.util.List;
 
 public class MyImage extends Observable {
         public final String IDENTIFIER;
@@ -30,7 +29,7 @@ public class MyImage extends Observable {
         private BufferedImage originalImage;
         public int[] originalData;
 
-        private BufferedImage transformedImage;
+        public BufferedImage transformedImage;
         public int[] transformedData;
 
         private BufferedImage modifiedImage;
@@ -44,7 +43,6 @@ public class MyImage extends Observable {
 
         private Selection selection;
         private Vector3 pivot;
-        private List<ColorVector3> tempPixels;
 
         public MyImage(String identifier, Image source) {
                 this.IDENTIFIER = identifier;
@@ -85,6 +83,14 @@ public class MyImage extends Observable {
 
                 inverseMatrix = Matrix.getIdentityMatrix();
                 transformationMatrix = Matrix.getIdentityMatrix();
+
+                createTransformedImage();
+        }
+
+        @Override
+        protected synchronized void setChanged() {
+                createTransformedImage();
+                super.setChanged();
         }
 
         public void resetModifiedImage() {
@@ -184,7 +190,7 @@ public class MyImage extends Observable {
                         && y < originalImage.getHeight();
         }
 
-        public BufferedImage getTransformedImage() {
+        public void createTransformedImage() {
                 for (int i = 0; i < transformedData.length; ++i) {
                         Vector3 point = dataIndexToCoords(i);
                         Vector3 transformedPoint = Matrix.multiply(inverseMatrix, point);
@@ -199,16 +205,6 @@ public class MyImage extends Observable {
                                 transformedData[i] = modifiedData[i];
                         }
                 }
-
-                if (tempPixels != null) {
-                        tempPixels.forEach(pixel -> {
-                                if (isInBounds(pixel)) {
-                                        transformedData[coordsToDataIndex(pixel)] = pixel.pixel;
-                                }
-                        });
-                }
-
-                return transformedImage;
         }
 
         public int[][] getTransformedSelection() {

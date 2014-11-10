@@ -149,9 +149,9 @@ public class Controller {
                 new Thread(() -> {
                         Map<Integer, Integer> colors = new HashMap<>();
 
-                        for (int i = 0; i < image.modifiedData.length; ++i) {
-                                int count = colors.getOrDefault(image.modifiedData[i], 0);
-                                colors.put(image.modifiedData[i], count + 1);
+                        for (int i = 0; i < image.transformedData.length; ++i) {
+                                int count = colors.getOrDefault(image.transformedData[i], 0);
+                                colors.put(image.transformedData[i], count + 1);
                         }
 
                         Map<Integer, Integer> sorted = new TreeMap<>((a, b) -> colors.get(b).compareTo(colors.get(a)));
@@ -160,10 +160,10 @@ public class Controller {
                         StringBuilder sb = new StringBuilder();
 
                         for (Map.Entry<Integer, Integer> entry : sorted.entrySet()) {
-                                sb.append(String.format("%-10x", entry.getKey()));
+                                sb.append(String.format("%-10X", entry.getKey()));
                                 sb.append(": ");
                                 sb.append(entry.getValue());
-                                sb.append('\n');
+                                sb.append(System.lineSeparator());
                         }
 
                         PrintWriter out = null;
