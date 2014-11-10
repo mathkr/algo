@@ -127,6 +127,7 @@ public class CanvasPanel extends JPanel implements Observer {
                                 g.translate(xTranslation, yTranslation);
 
                                 g.drawImage(image.transformedImage, 0, 0, this);
+                                g.drawImage(image.shapesImage, 0, 0, this);
 
                                 if (image.hasSelection()) {
                                         paintSelection(g, image.getTransformedSelection());

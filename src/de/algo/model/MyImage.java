@@ -35,7 +35,7 @@ public class MyImage extends Observable {
         private BufferedImage modifiedImage;
         public int[] modifiedData;
 
-        private BufferedImage shapesImage;
+        public BufferedImage shapesImage;
         public int[] shapesData;
 
         private Matrix inverseMatrix;
@@ -87,18 +87,13 @@ public class MyImage extends Observable {
                 createTransformedImage();
         }
 
-        @Override
-        protected synchronized void setChanged() {
-                createTransformedImage();
-                super.setChanged();
-        }
-
         public void resetModifiedImage() {
                 transformationMatrix = Matrix.getIdentityMatrix();
                 inverseMatrix = Matrix.getIdentityMatrix();
 
                 System.arraycopy(originalData, 0, modifiedData, 0, originalData.length);
 
+                createTransformedImage();
                 setChanged();
                 notifyObservers();
         }
@@ -176,7 +171,7 @@ public class MyImage extends Observable {
                 }
         }
 
-        private boolean isInBounds(Vector3 p) {
+        public boolean isInBounds(Vector3 p) {
                 return     p.x >= 0
                         && p.y >= 0
                         && p.x < originalImage.getWidth()
@@ -195,9 +190,7 @@ public class MyImage extends Observable {
                         Vector3 point = dataIndexToCoords(i);
                         Vector3 transformedPoint = Matrix.multiply(inverseMatrix, point);
 
-                        if (shapesData[i] != 0) {
-                                transformedData[i] = shapesData[i];
-                        } else if (isInSelection(transformedPoint)) {
+                        if (isInSelection(transformedPoint)) {
                                 transformedData[i] = modifiedData[coordsToDataIndex(transformedPoint)];
                         } else if (isInSelection(point)) {
                                 transformedData[i] = 0xFFFFFFFF;
@@ -248,6 +241,7 @@ public class MyImage extends Observable {
                 this.inverseMatrix = Matrix.multiply(this.inverseMatrix, inverse);
                 this.transformationMatrix = Matrix.multiply(transformation, this.transformationMatrix);
 
+                createTransformedImage();
                 setChanged();
                 notifyObservers();
         }
@@ -278,6 +272,7 @@ public class MyImage extends Observable {
                         h,
                         (img, infoflags, a, b, width, height) -> false);
 
+                createTransformedImage();
                 setChanged();
                 notifyObservers();
         }
@@ -285,7 +280,9 @@ public class MyImage extends Observable {
         public void applyShapes(boolean temporary) {
                 if (!temporary) {
                         writeModifications();
-
+                        modifiedImage.getGraphics()
+                                .drawImage(shapesImage, 0, 0, (img, infoflags, x, y, width, height) -> false);
+                        createTransformedImage();
                         clearShapes();
                 }
 

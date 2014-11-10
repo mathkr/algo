@@ -55,12 +55,12 @@ public class ColorButton extends JButton {
                 if (enabled) {
                         COLORS.put(id, color);
                 } else {
-                        COLORS.put(id, COLORS.get(PRIMARY));
+                        COLORS.remove(id);
                 }
         }
 
         public static Color getColor(int id) {
-                return COLORS.get(id);
+                return COLORS.getOrDefault(id, COLORS.get(PRIMARY));
         }
 
         @Override

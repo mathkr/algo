@@ -19,6 +19,7 @@
 
 package de.algo.view.tools;
 
+import de.algo.model.MyImage;
 import de.algo.model.Vector3;
 import de.algo.view.CanvasPanel;
 
@@ -40,7 +41,7 @@ public class SelectionTool extends MouseInputAdapter {
                 if (start != null) {
                         end = new Vector3(e.getX(), e.getY(), 1);
 
-                        ((CanvasPanel)e.getComponent()).image.setSelection(start, end);
+                        select(((CanvasPanel)e.getComponent()).image, end);
                 }
         }
 
@@ -49,7 +50,26 @@ public class SelectionTool extends MouseInputAdapter {
                 if (start != null) {
                         end = new Vector3(e.getX(), e.getY(), 1);
 
-                        ((CanvasPanel)e.getComponent()).image.setSelection(start, end);
+                        select(((CanvasPanel)e.getComponent()).image, end);
                 }
+        }
+
+        private void select(MyImage image, Vector3 end) {
+                int w = image.transformedImage.getWidth();
+                int h = image.transformedImage.getHeight();
+
+                start.x = start.x <  0 ? 0 : start.x;
+                start.x = start.x >= w ? w - 1 : start.x;
+
+                start.y = start.y <  0 ? 0 : start.y;
+                start.y = start.y >= h ? h - 1 : start.y;
+
+                end.x = end.x <  0 ? 0 : end.x;
+                end.x = end.x >= w ? w - 1 : end.x;
+
+                end.y = end.y <  0 ? 0 : end.y;
+                end.y = end.y >= h ? h - 1 : end.y;
+
+                image.setSelection(start, end);
         }
 }
