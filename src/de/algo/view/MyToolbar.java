@@ -128,8 +128,7 @@ public class MyToolbar extends JToolBar {
                 add(colorButtonPrimary);
 
                 JButton toggleGradient = new JButton(View.getIcon("gradient_icon&24"));
-                JCheckBox gradientCheckbox = new JCheckBox();
-                gradientCheckbox.setPreferredSize(new Dimension(32, 32));
+                toggleGradient.setToolTipText("Toggle color gradient");
                 add(toggleGradient);
 
                 ColorButton colorButtonSecondary = new ColorButton(
@@ -138,9 +137,6 @@ public class MyToolbar extends JToolBar {
                         "Secondary color");
                 colorButtonSecondary.setEnabled(false);
                 add(colorButtonSecondary);
-
-                gradientCheckbox.addItemListener(
-                        e -> colorButtonSecondary.setEnabled(e.getStateChange() == ItemEvent.SELECTED));
 
                 toggleGradient.addActionListener(
                         e -> colorButtonSecondary.setEnabled(!colorButtonSecondary.isEnabled()));

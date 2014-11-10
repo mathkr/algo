@@ -41,7 +41,11 @@ public class CopyTool implements ActionListener {
                 if (panel != null) {
                         MyImage source = panel.image;
 
-                        if (source.hasSelection()) {
+                        if (source.hasSelection()
+                                && source.getSelection().getWidth() > 0
+                                && source.getSelection().getHeight() > 0)
+                        {
+
                                 clipboard = source.getSelectedArea();
 
                                 String msg = String.format(

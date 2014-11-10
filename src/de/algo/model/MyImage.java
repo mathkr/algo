@@ -38,6 +38,10 @@ public class MyImage extends Observable {
         public BufferedImage shapesImage;
         public int[] shapesData;
 
+        public BufferedImage pastedImage;
+        public int[] pastedData;
+        private Matrix pastedMatrix;
+
         private Matrix inverseMatrix;
         private Matrix transformationMatrix;
 
@@ -91,6 +95,10 @@ public class MyImage extends Observable {
                 transformationMatrix = Matrix.getIdentityMatrix();
                 inverseMatrix = Matrix.getIdentityMatrix();
 
+                pastedImage = null;
+                pastedData = null;
+                pastedMatrix = Matrix.getIdentityMatrix();
+
                 System.arraycopy(originalData, 0, modifiedData, 0, originalData.length);
 
                 createTransformedImage();
@@ -102,6 +110,10 @@ public class MyImage extends Observable {
                 System.arraycopy(transformedData, 0, modifiedData, 0, transformedData.length);
                 transformationMatrix = Matrix.getIdentityMatrix();
                 inverseMatrix = Matrix.getIdentityMatrix();
+
+                pastedImage = null;
+                pastedData = null;
+                pastedMatrix = Matrix.getIdentityMatrix();
         }
 
         public void setSelection(Vector3 a, Vector3 b) {
@@ -186,18 +198,42 @@ public class MyImage extends Observable {
         }
 
         public void createTransformedImage() {
-                for (int i = 0; i < transformedData.length; ++i) {
-                        Vector3 point = dataIndexToCoords(i);
-                        Vector3 transformedPoint = Matrix.multiply(inverseMatrix, point);
+                if (pastedImage == null) {
+                        for (int i = 0; i < transformedData.length; ++i) {
+                                Vector3 point = dataIndexToCoords(i);
+                                Vector3 transformedPoint = Matrix.multiply(inverseMatrix, point);
 
-                        if (isInSelection(transformedPoint)) {
-                                transformedData[i] = modifiedData[coordsToDataIndex(transformedPoint)];
-                        } else if (isInSelection(point)) {
-                                transformedData[i] = 0xFFFFFFFF;
-                        } else {
-                                transformedData[i] = modifiedData[i];
+                                if (isInSelection(transformedPoint)) {
+                                        transformedData[i] = modifiedData[coordsToDataIndex(transformedPoint)];
+                                } else if (isInSelection(point)) {
+                                        transformedData[i] = 0xFFFFFFFF;
+                                } else {
+                                        transformedData[i] = modifiedData[i];
+                                }
+                        }
+                } else {
+                        for (int i = 0; i < transformedData.length; ++i) {
+                                Vector3 point = dataIndexToCoords(i);
+                                Vector3 pastedPoint = Matrix.multiply(pastedMatrix, point);
+
+                                if (isInPasteBounds(pastedPoint)) {
+                                        transformedData[i] = pastedData[coordsToPasteDataIndex(pastedPoint)];
+                                } else {
+                                        transformedData[i] = modifiedData[i];
+                                }
                         }
                 }
+        }
+
+        private boolean isInPasteBounds(Vector3 p) {
+                return     p.x >= 0
+                        && p.y >= 0
+                        && p.x < pastedImage.getWidth()
+                        && p.y < pastedImage.getHeight();
+        }
+
+        private int coordsToPasteDataIndex(Vector3 p) {
+                return p.y * pastedImage.getWidth() + p.x;
         }
 
         public int[][] getTransformedSelection() {
@@ -241,6 +277,10 @@ public class MyImage extends Observable {
                 this.inverseMatrix = Matrix.multiply(this.inverseMatrix, inverse);
                 this.transformationMatrix = Matrix.multiply(transformation, this.transformationMatrix);
 
+                if (pastedImage != null) {
+                        this.pastedMatrix = Matrix.multiply(this.pastedMatrix, inverse);
+                }
+
                 createTransformedImage();
                 setChanged();
                 notifyObservers();
@@ -263,16 +303,26 @@ public class MyImage extends Observable {
                 return selection;
         }
 
-        public void paste(BufferedImage source, int x, int y, int w, int h) {
-                modifiedImage.getGraphics().drawImage(
-                        source,
-                        x,
-                        y,
-                        w,
-                        h,
-                        (img, infoflags, a, b, width, height) -> false);
+        public void paste(BufferedImage source, int w, int h) {
+                if (selection != null) {
+                        writeModifications();
+                } else {
+                        setSelection(new Vector3(0, 0), new Vector3(w, h));
+                }
 
+                pastedImage = source;
+                pastedData = ((DataBufferInt) pastedImage.getRaster().getDataBuffer()).getData();
+
+                double factorX = (double) selection.getWidth() / (double) pastedImage.getWidth();
+                double factorY = (double) selection.getHeight() / (double) pastedImage.getHeight();
+
+                Matrix inverse = Matrix.getIdentityMatrix();
+                inverse = Matrix.multiply(inverse, Matrix.getScalingMatrix(1.0 / factorX, 1.0 / factorY));
+                inverse = Matrix.multiply(inverse, Matrix.getTranslationMatrix(-selection.topL.x, -selection.topL.y));
+
+                pastedMatrix = inverse;
                 createTransformedImage();
+
                 setChanged();
                 notifyObservers();
         }

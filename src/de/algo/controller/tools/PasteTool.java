@@ -19,9 +19,6 @@
 
 package de.algo.controller.tools;
 
-import de.algo.model.MyImage;
-import de.algo.model.Selection;
-import de.algo.model.Vector3;
 import de.algo.view.CanvasPanel;
 import de.algo.view.InfoBar;
 import de.algo.view.View;
@@ -43,19 +40,8 @@ public class PasteTool implements ActionListener {
                                 return;
                         }
 
-                        MyImage sink = panel.image;
-                        if (sink.hasSelection()) {
-                                Selection sel = sink.getSelection();
-                                sink.paste(clipboard, sel.topL.x, sel.topL.y, sel.getWidth(), sel.getHeight());
-                                InfoBar.publish("Pasted clipboard into selected area");
-                        } else if (sink.hasPivot()) {
-                                Vector3 pivot = sink.getPivot();
-                                sink.paste(clipboard, pivot.x, pivot.y, clipboard.getWidth(), clipboard.getHeight());
-                                InfoBar.publish("Pasted clipboard at pivot");
-                        } else {
-                                sink.paste(clipboard, 0, 0, clipboard.getWidth(), clipboard.getHeight());
-                                InfoBar.publish("Pasted clipboard at origin");
-                        }
+                        panel.image.paste(clipboard, clipboard.getWidth(), clipboard.getHeight());
+                        InfoBar.publish("Pasted from clipboard");
                 }
         }
 }

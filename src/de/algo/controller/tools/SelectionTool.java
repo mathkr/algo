@@ -70,6 +70,8 @@ public class SelectionTool extends MouseInputAdapter {
                 end.y = end.y <  0 ? 0 : end.y;
                 end.y = end.y >= h ? h - 1 : end.y;
 
-                image.setSelection(start, end);
+                if (Math.abs(start.x - end.x) > 1 && Math.abs(start.y - end.y) > 1) {
+                        image.setSelection(start, end);
+                }
         }
 }

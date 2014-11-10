@@ -56,6 +56,8 @@ public class View implements Observer {
 
                 MAIN_FRAME = new MainFrame();
 
+                ToolTipManager.sharedInstance().setInitialDelay(100);
+
                 FILEFILTER = new FileNameExtensionFilter("JPG and GIF Images", "jpg", "jpeg", "gif");
                 imageChooser = new JFileChooser(".");
                 imageChooser.setMultiSelectionEnabled(true);
