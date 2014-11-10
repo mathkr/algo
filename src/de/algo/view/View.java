@@ -192,8 +192,7 @@ public class View implements Observer {
 
                         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
                         SlideshowPanel panel = new SlideshowPanel(images, 2000, 1000, screen.width, screen.height);
-                        SlideshowDialog show = new SlideshowDialog(panel, screen, MAIN_FRAME);
-                        show.toFront();
+                        new SlideshowDialog(panel, screen, MAIN_FRAME);
                 });
         }
 

@@ -47,17 +47,18 @@ public class SlideshowDialog extends JDialog {
                 });
 
                 setLayout(new BorderLayout());
+
                 add(slideshowPanel, BorderLayout.CENTER);
 
                 setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
                 setUndecorated(true);
-
                 setPreferredSize(size);
+                setLocationRelativeTo(null);
 
                 pack();
-                setLocationRelativeTo(null);
-                setVisible(true);
+                toFront();
 
                 slideshowPanel.start();
+                setVisible(true);
         }
 }

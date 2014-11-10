@@ -69,39 +69,30 @@ public class SelectDialog extends JDialog {
 
                 accept = new JButton("Accept");
                 accept.setEnabled(false);
-                accept.addActionListener(e -> submit(true));
+                accept.addActionListener(e -> submit());
                 buttonsPanel.add(accept);
 
                 buttonsPanel.add(Box.createHorizontalStrut(10));
 
                 cancel = new JButton("Cancel");
-                cancel.addActionListener(e -> submit(false));
+                cancel.addActionListener(e -> dispose());
                 buttonsPanel.add(cancel);
 
                 buttonsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
                 add(buttonsPanel, BorderLayout.SOUTH);
-
-                addWindowListener(new WindowAdapter() {
-                        @Override
-                        public void windowClosing(WindowEvent e) {
-                                submit(false);
-                        }
-                });
         }
 
         public void addActionListener(ActionListener actionListener) {
                 this.actionListener = actionListener;
         }
 
-        private void submit(boolean success) {
-                if (success) {
-                        if (actionListener != null) {
-                                actionListener.actionPerformed(new ActionEvent(this, 0, ""));
-                        }
-                }
+        private void submit() {
+                dispose();
 
-                setVisible(false);
+                if (actionListener != null) {
+                        actionListener.actionPerformed(new ActionEvent(this, 0, ""));
+                }
         }
 
         public void setImages(Collection<MyImage> images) {

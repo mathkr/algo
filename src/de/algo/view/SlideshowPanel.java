@@ -26,12 +26,15 @@ import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SlideshowPanel extends JPanel {
         private List<MyImage> images;
-        private List<MyImage> scaledImages;
+        private List<BufferedImage> scaledImages;
+        private List<int[]> scaledImageDates;
 
         private int transitionTimePassed;
         private int transitionPercent;
@@ -42,22 +45,20 @@ public class SlideshowPanel extends JPanel {
         private Timer transitionTimer;
         private long lastStepTime;
 
-        private MyImage buffer;
+        private BufferedImage buffer;
+        private int[] bufferData;
 
         public SlideshowPanel(List<MyImage> images, int showTime, int transitionTime, int width, int height) {
                 this.images = images;
-                this.scaledImages = new ArrayList<>();
 
-                BufferedImage initial = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                View.drawImageCentered(
-                        images.get(0).getBufferedImage(),
-                        initial.getGraphics(),
-                        width,
-                        height,
-                        images.get(0).getBufferedImage().getWidth(),
-                        images.get(0).getBufferedImage().getHeight()
-                );
-                buffer = new MyImage(images.get(0).IDENTIFIER, initial);
+                this.scaledImages = new ArrayList<>();
+                this.scaledImageDates = new ArrayList<>();
+
+                scaleImages(width, height);
+
+                buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                bufferData = getData(buffer);
+                System.arraycopy(scaledImageDates.get(0), 0, bufferData, 0, width * height);
 
                 setBackground(Color.BLACK);
                 setForeground(Color.WHITE);
@@ -96,37 +97,45 @@ public class SlideshowPanel extends JPanel {
                 transitionTimer.setRepeats(true);
         }
 
+        private int[] getData(BufferedImage image) {
+                return ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        }
+
         private void blendImages(int transitionPercent) {
-                MyImage curr = scaledImages.get(currentImage);
-                MyImage next = scaledImages.get((currentImage + 1) >= scaledImages.size() ? 0 : currentImage + 1);
-                for (int i = 0; i < buffer.originalData.length; ++i) {
-                        buffer.originalData[i] = Blend.blendPixel(curr.originalData[i], next.originalData[i], transitionPercent);
+                int[] curr = scaledImageDates.get(currentImage);
+                int[] next = scaledImageDates
+                        .get((currentImage + 1) >= scaledImageDates.size() ? 0 : currentImage + 1);
+
+                for (int i = 0; i < getData(buffer).length; ++i) {
+                        bufferData[i] = Blend.blendPixel(curr[i], next[i], transitionPercent);
                 }
         }
 
-        private void scaleImages() {
+        private void scaleImages(int width, int height) {
                 for (int i = 0; i < images.size(); ++i) {
-                        BufferedImage scaled = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+                        BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                         Graphics g = scaled.getGraphics();
                         g.setColor(Color.BLACK);
-                        g.fillRect(0, 0, getWidth(), getHeight());
+                        g.fillRect(0, 0, width, height);
+
                         BufferedImage original = images.get(i).getBufferedImage();
-                        View.drawImageCentered(original, g, getWidth(), getHeight(), original.getWidth(), original.getHeight());
-                        scaledImages.add(new MyImage(images.get(i).IDENTIFIER, scaled));
+
+                        View.drawImageCentered(original, g, width, height, original.getWidth(), original.getHeight());
+
+                        scaledImages.add(scaled);
+                        scaledImageDates.add(getData(scaled));
                 }
         }
 
         public void start() {
-                scaleImages();
                 showTimer.start();
-                repaint();
         }
 
         @Override
         protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
-                g.drawImage(buffer.getBufferedImage(), 0, 0, this);
+                g.drawImage(buffer, 0, 0, this);
 
                 /*
                 g.drawString("showTime            : " + showTime, 10, 30);
