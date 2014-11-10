@@ -28,7 +28,6 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 
 public class MyToolbar extends JToolBar {
         private ToolButton selectedTool;

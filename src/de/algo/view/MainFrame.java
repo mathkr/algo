@@ -52,6 +52,8 @@ public class MainFrame extends JFrame {
                 CANVASAREA.add(CANVASTABS, BorderLayout.CENTER);
 
                 TOOLBAR = new MyToolbar();
+                TOOLBAR.addChangeListener(e -> CANVASTABS.setCursor(TOOLBAR.getToolCursor()));
+
                 CANVASAREA.add(TOOLBAR, BorderLayout.WEST);
 
                 GALLERY = new ImageSelectorPanel(250, 1, 10, false);
