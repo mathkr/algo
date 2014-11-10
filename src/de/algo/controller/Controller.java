@@ -38,6 +38,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Controller class which loosely models the MVC controller concept.
+ */
 public class Controller {
         private View view;
         private Model model;
@@ -73,7 +76,7 @@ public class Controller {
 
                         files = files
                                 .stream()
-                                .filter(f -> isValidFile(f))
+                                .filter(this::isValidFile)
                                 .map(f -> {
                                         Logger.log(Logger.DEBUG, "Loading " + f.getPath());
                                         return f;
@@ -87,7 +90,7 @@ public class Controller {
                         } else {
                                 Map<String, Image> imageMap = loadImages(files);
                                 model.addImages(imageMap);
-                                SwingUtilities.invokeLater(() -> view.updateGallery());
+                                SwingUtilities.invokeLater(view::updateGallery);
 
                                 timer.stop();
                                 Logger.log(

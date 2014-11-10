@@ -23,11 +23,9 @@ import de.algo.model.Blend;
 import de.algo.model.MyImage;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,13 +110,13 @@ public class SlideshowPanel extends JPanel {
         }
 
         private void scaleImages(int width, int height) {
-                for (int i = 0; i < images.size(); ++i) {
+                for (MyImage image : images) {
                         BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                         Graphics g = scaled.getGraphics();
                         g.setColor(Color.BLACK);
                         g.fillRect(0, 0, width, height);
 
-                        BufferedImage original = images.get(i).getBufferedImage();
+                        BufferedImage original = image.getBufferedImage();
 
                         View.drawImageCentered(original, g, width, height, original.getWidth(), original.getHeight());
 

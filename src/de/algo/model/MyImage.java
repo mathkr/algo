@@ -23,23 +23,49 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 
+/**
+ * Internal representation of an image on which linear transformations and drawing operations
+ * can be performed. It is being observed by its corresponding instance of CanvasPanel.
+ */
 public class MyImage extends Observable {
         public final String IDENTIFIER;
 
+        /**
+         * The original image that has been loaded and converted to a BufferedImage of
+         * type INT_ARGB.
+         */
         private BufferedImage originalImage;
         public int[] originalData;
 
+        /**
+         * Image that is being created by applying the matrix transformations.
+         */
         public BufferedImage transformedImage;
         public int[] transformedData;
 
+        /**
+         * Base image of the editable image in which all modifications persist, unless
+         * <a href="#resetModifiedImage">resetModifiedImage</a> has been called.
+         */
         private BufferedImage modifiedImage;
         public int[] modifiedData;
 
+        /**
+         * Image in which temporary shapes get drawn until they get written into modifiedImage.
+         */
         public BufferedImage shapesImage;
         public int[] shapesData;
 
+        /**
+         * Image which holds the pasted image area if <a href="#paste">paste</a> has been called.
+         * Should hold null in any other case.
+         */
         public BufferedImage pastedImage;
         public int[] pastedData;
+
+        /**
+         * Transforms the pasted image section into the current selection.
+         */
         private Matrix pastedMatrix;
 
         private Matrix inverseMatrix;
@@ -91,6 +117,9 @@ public class MyImage extends Observable {
                 createTransformedImage();
         }
 
+        /**
+         * Resets all modifications to the modified image and resets the transformation matrices.
+         */
         public void resetModifiedImage() {
                 transformationMatrix = Matrix.getIdentityMatrix();
                 inverseMatrix = Matrix.getIdentityMatrix();
@@ -106,6 +135,10 @@ public class MyImage extends Observable {
                 notifyObservers();
         }
 
+        /**
+         * Writes the modifications that have been applied to the transformedImage into the modified
+         * image and resets all matrices.
+         */
         private void writeModifications() {
                 System.arraycopy(transformedData, 0, modifiedData, 0, transformedData.length);
                 transformationMatrix = Matrix.getIdentityMatrix();
@@ -176,10 +209,8 @@ public class MyImage extends Observable {
         private boolean isInSelection(Vector3 p) {
                 if (!isInBounds(p)) {
                         return false;
-                } else if (selection == null) {
-                        return true;
                 } else {
-                        return selection.contains(p);
+                        return selection == null || selection.contains(p);
                 }
         }
 
@@ -197,6 +228,11 @@ public class MyImage extends Observable {
                         && y < originalImage.getHeight();
         }
 
+        /**
+         * Applies all matrices to the corresponding image data and updates the transformedImage.
+         * Is being called whenever modifications to the matrices have been made or when an image
+         * has been pasted or when modifiedImage has been modified.
+         */
         public void createTransformedImage() {
                 if (pastedImage == null) {
                         for (int i = 0; i < transformedData.length; ++i) {
@@ -236,6 +272,12 @@ public class MyImage extends Observable {
                 return p.y * pastedImage.getWidth() + p.x;
         }
 
+        /**
+         * Calculates the points of the displayed selection by using the non-inverted matrix and
+         * the selection set by <a href="#setSelection">setSelection</a>.
+         *
+         * @return The selection points for drawing with an awt.Polygon.
+         */
         public int[][] getTransformedSelection() {
                 Vector3[] points = new Vector3[4];
                 int[][] res = new int[2][4];
@@ -273,6 +315,11 @@ public class MyImage extends Observable {
                 return y * originalImage.getWidth() + x;
         }
 
+        /**
+         * Adds a transformation to the transformation matrices that get applied to the image data.
+         * @param inverse The inverse matrix for the linear transformation.
+         * @param transformation The regular matrix, that is being used for transforming the displayed selection.
+         */
         public void addTransformation(Matrix inverse, Matrix transformation) {
                 this.inverseMatrix = Matrix.multiply(this.inverseMatrix, inverse);
                 this.transformationMatrix = Matrix.multiply(transformation, this.transformationMatrix);
@@ -303,6 +350,10 @@ public class MyImage extends Observable {
                 return selection;
         }
 
+        /**
+         * Pastes an image into this MyImage instance and allows for application of further transformation
+         * on the pasted area.
+         */
         public void paste(BufferedImage source, int w, int h) {
                 if (selection != null) {
                         writeModifications();
@@ -327,6 +378,10 @@ public class MyImage extends Observable {
                 notifyObservers();
         }
 
+        /**
+         * Notifies the MyImage that modifications to the shapesImage have been made.
+         * If temporary is false, than the drawn shape is being applied to modifiedImage.
+         */
         public void applyShapes(boolean temporary) {
                 if (!temporary) {
                         writeModifications();

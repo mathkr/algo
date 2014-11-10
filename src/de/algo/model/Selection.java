@@ -19,8 +19,6 @@
 
 package de.algo.model;
 
-import java.awt.*;
-
 public class Selection {
         public Vector3 topL;
         public Vector3 botR;

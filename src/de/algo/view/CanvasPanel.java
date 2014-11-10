@@ -29,6 +29,13 @@ import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * Represents the main image editing area. There is one CanvasPanel for each image,
+ * that is being edited.
+ *
+ * It observes its MyImage instance which sends notifies the CanvasPanel once it
+ * has been updated.
+ */
 public class CanvasPanel extends JPanel implements Observer {
         public MyImage image;
         private Stroke selectionStroke;
@@ -96,7 +103,7 @@ public class CanvasPanel extends JPanel implements Observer {
                                         e.isPopupTrigger());
                         }
 
-                        private void setTranslation(Graphics g) {
+                        private void setTranslation() {
                                 if (image.getBufferedImage().getWidth() < getWidth()) {
                                         xTranslation = (getWidth() - image.getBufferedImage().getWidth()) / 2;
                                 }
@@ -121,7 +128,7 @@ public class CanvasPanel extends JPanel implements Observer {
                         protected void paintComponent(Graphics g) {
                                 super.paintComponent(g);
 
-                                setTranslation(g);
+                                setTranslation();
                                 g.translate(xTranslation, yTranslation);
 
                                 g.drawImage(image.transformedImage, 0, 0, this);

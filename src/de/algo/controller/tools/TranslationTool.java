@@ -28,7 +28,7 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
 public class TranslationTool extends MouseInputAdapter {
-        public Vector3 start;
+        private Vector3 start;
 
         @Override
         public void mousePressed(MouseEvent e) {
@@ -53,7 +53,7 @@ public class TranslationTool extends MouseInputAdapter {
                 }
         }
 
-        public void translate(Vector3 p, MyImage image) {
+        void translate(Vector3 p, MyImage image) {
                 Matrix inverse = Matrix.getTranslationMatrix(-p.x, -p.y);
                 Matrix regular = Matrix.getTranslationMatrix(p.x, p.y);
                 image.addTransformation(inverse, regular);

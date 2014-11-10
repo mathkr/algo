@@ -121,7 +121,7 @@ public class Bresenham {
                 }
         }
 
-        public static void setCirclePixels(MyImage image, Vector3 p, List<Vector3> section, int colorA, int colorB) {
+        private static void setCirclePixels(MyImage image, Vector3 p, List<Vector3> section, int colorA, int colorB) {
                 int i = 0;
 
                 for (int j = 0; j < section.size(); ++j, ++i) {
@@ -147,7 +147,7 @@ public class Bresenham {
                 }
         }
 
-        public static void setFilledCirclePixels(MyImage image, Vector3 p, int x, int y, int colorA, int colorB, int radius) {
+        private static void setFilledCirclePixels(MyImage image, Vector3 p, int x, int y, int colorA, int colorB, int radius) {
                 for (int i = 0; i <= x; ++i) {
                         int dist = (int) Math.sqrt(Math.pow(i, 2.0) + Math.pow(y, 2.0));
                         int color = Blend.blendPixel(colorA, colorB, (dist * 100) / radius);

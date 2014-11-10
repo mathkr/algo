@@ -52,9 +52,7 @@ public class GalleryPanel extends JPanel {
                 EDIT.setEnabled(false);
                 buttonsPanel.add(EDIT);
 
-                GALLERY.addChangeListener(e -> {
-                        EDIT.setEnabled(!GALLERY.getSelected().isEmpty());
-                });
+                GALLERY.addChangeListener(e -> EDIT.setEnabled(!GALLERY.getSelected().isEmpty()));
 
                 Border border = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 0, 0, 1),
                         BorderFactory.createLineBorder(Color.GRAY));

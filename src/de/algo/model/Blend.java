@@ -30,7 +30,7 @@ public class Blend {
         }
 
 
-        public static int blendComponent(int a, int b, int transitionPercent) {
+        private static int blendComponent(int a, int b, int transitionPercent) {
                 return a + (b - a) * transitionPercent / 100;
         }
 }

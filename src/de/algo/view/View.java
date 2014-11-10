@@ -33,6 +33,9 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Loosely represents the View as specified by the MVC concept.
+ */
 public class View implements Observer {
         private static View view;
 

@@ -54,11 +54,11 @@ public class Logger {
         public static void log(int level, String msg) {
                 if (level <= maximumLogLevel) {
                         String[] lines = msg.split("\n");
-                        for (int i = 0; i < lines.length; ++i) {
+                        for (String line : lines) {
                                 if (printPrefix) {
                                         System.out.print(PREFIXES[level] + ": ");
                                 }
-                                System.out.println(lines[i]);
+                                System.out.println(line);
                         }
                 }
         }

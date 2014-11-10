@@ -28,7 +28,7 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
 public class ScalingTool extends MouseInputAdapter {
-        public Vector3 start;
+        private Vector3 start;
 
         @Override
         public void mousePressed(MouseEvent e) {

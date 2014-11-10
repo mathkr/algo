@@ -20,10 +20,8 @@
 package de.algo.view;
 
 import de.algo.model.MyImage;
-import de.algo.util.Logger;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -117,18 +115,13 @@ public class ImageSelectorPanel extends JPanel {
                 return new Dimension(w, h);
         }
 
-        @Override
-        protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-        }
-
         public Set<String> getSelected() {
                 return new HashSet<>(selected.keySet());
         }
 
         public void selectAll() {
                 if (multiSelect) {
-                        tiles.forEach((s, t) -> selected.put(s, t));
+                        tiles.forEach(selected::put);
                         selected.forEach((s, t) -> t.setSelected(true));
                         repaint();
                 }

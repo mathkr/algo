@@ -28,9 +28,9 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
 public class RotationTool extends MouseInputAdapter {
-        public static final double FACTOR = 0.25;
+        private static final double FACTOR = 0.25;
 
-        public Vector3 start;
+        private Vector3 start;
 
         @Override
         public void mousePressed(MouseEvent e) {

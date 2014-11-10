@@ -27,8 +27,8 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
 public class SelectionTool extends MouseInputAdapter {
-        public Vector3 start;
-        public Vector3 end;
+        private Vector3 start;
+        private Vector3 end;
 
         @Override
         public void mousePressed(MouseEvent e) {

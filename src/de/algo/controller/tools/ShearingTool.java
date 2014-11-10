@@ -28,9 +28,9 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
 public class ShearingTool extends MouseInputAdapter {
-        public static final double FACTOR = 200.0;
+        private static final double FACTOR = 200.0;
 
-        public Vector3 start;
+        private Vector3 start;
 
         private boolean xAxis;
 
