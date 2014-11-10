@@ -17,59 +17,49 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.algo.view.tools;
+package de.algo.controller.tools;
 
-import de.algo.model.MyImage;
-import de.algo.model.Vector3;
+import de.algo.model.*;
 import de.algo.view.CanvasPanel;
+import de.algo.view.ColorButton;
 
 import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
-public class SelectionTool extends MouseInputAdapter {
+public class FilledCircleTool extends MouseInputAdapter {
         public Vector3 start;
-        public Vector3 end;
 
         @Override
         public void mousePressed(MouseEvent e) {
                 start = new Vector3(e.getX(), e.getY(), 1);
-                end = null;
+                ((CanvasPanel) e.getComponent()).image.removeSelection();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-                if (start != null) {
-                        end = new Vector3(e.getX(), e.getY(), 1);
-
-                        select(((CanvasPanel)e.getComponent()).image, end);
-                }
+                circle(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, false);
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-                if (start != null) {
-                        end = new Vector3(e.getX(), e.getY(), 1);
-
-                        select(((CanvasPanel)e.getComponent()).image, end);
-                }
+                circle(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, true);
         }
 
-        private void select(MyImage image, Vector3 end) {
-                int w = image.transformedImage.getWidth();
-                int h = image.transformedImage.getHeight();
+        private void circle(Vector3 end, MyImage image, boolean temporary) {
+                if (start != null) {
+                        int radius = (int) Vector3.getDistance(start, end);
+                        if (radius == 0) {
+                                return;
+                        }
 
-                start.x = start.x <  0 ? 0 : start.x;
-                start.x = start.x >= w ? w - 1 : start.x;
+                        image.clearShapes();
 
-                start.y = start.y <  0 ? 0 : start.y;
-                start.y = start.y >= h ? h - 1 : start.y;
+                        int colorA = ColorButton.getColor(ColorButton.PRIMARY).getRGB();
+                        int colorB = ColorButton.getColor(ColorButton.SECONDARY).getRGB();
 
-                end.x = end.x <  0 ? 0 : end.x;
-                end.x = end.x >= w ? w - 1 : end.x;
+                        Bresenham.drawFilledCircle(start, radius, image, colorA, colorB);
 
-                end.y = end.y <  0 ? 0 : end.y;
-                end.y = end.y >= h ? h - 1 : end.y;
-
-                image.setSelection(start, end);
+                        image.applyShapes(temporary);
+                }
         }
 }

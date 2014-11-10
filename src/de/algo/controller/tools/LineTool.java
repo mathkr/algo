@@ -17,45 +17,45 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.algo.view.tools;
+package de.algo.controller.tools;
 
-import de.algo.model.Matrix;
-import de.algo.model.MyImage;
-import de.algo.model.Vector3;
+import de.algo.model.*;
 import de.algo.view.CanvasPanel;
+import de.algo.view.ColorButton;
 
 import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
-public class TranslationTool extends MouseInputAdapter {
+public class LineTool extends MouseInputAdapter {
         public Vector3 start;
 
         @Override
         public void mousePressed(MouseEvent e) {
                 start = new Vector3(e.getX(), e.getY(), 1);
+                ((CanvasPanel) e.getComponent()).image.removeSelection();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-                if (start != null) {
-                        Vector3 translation = Vector3.subtract(new Vector3(e.getX(), e.getY()), start);
-                        translate(translation, ((CanvasPanel) e.getComponent()).image);
-                        start = null;
-                }
+                line(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, false);
+                start = null;
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-                if (start != null) {
-                        Vector3 translation = Vector3.subtract(new Vector3(e.getX(), e.getY()), start);
-                        translate(translation, ((CanvasPanel) e.getComponent()).image);
-                        start = new Vector3(e.getX(), e.getY());
-                }
+                line(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, true);
         }
 
-        public void translate(Vector3 p, MyImage image) {
-                Matrix inverse = Matrix.getTranslationMatrix(-p.x, -p.y);
-                Matrix regular = Matrix.getTranslationMatrix(p.x, p.y);
-                image.addTransformation(inverse, regular);
+        private void line(Vector3 end, MyImage image, boolean temporary) {
+                if (start != null) {
+                        image.clearShapes();
+
+                        int colorA = ColorButton.getColor(ColorButton.PRIMARY).getRGB();
+                        int colorB = ColorButton.getColor(ColorButton.SECONDARY).getRGB();
+
+                        Bresenham.drawLine(start, end, image, colorA, colorB);
+
+                        image.applyShapes(temporary);
+                }
         }
 }

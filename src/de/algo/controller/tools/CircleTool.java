@@ -17,16 +17,18 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.algo.view.tools;
+package de.algo.controller.tools;
 
-import de.algo.model.*;
+import de.algo.model.Bresenham;
+import de.algo.model.MyImage;
+import de.algo.model.Vector3;
 import de.algo.view.CanvasPanel;
 import de.algo.view.ColorButton;
 
 import javax.swing.event.MouseInputAdapter;
 import java.awt.event.MouseEvent;
 
-public class LineTool extends MouseInputAdapter {
+public class CircleTool extends MouseInputAdapter {
         public Vector3 start;
 
         @Override
@@ -37,23 +39,27 @@ public class LineTool extends MouseInputAdapter {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-                line(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, false);
-                start = null;
+                circle(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, false);
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-                line(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, true);
+                circle(new Vector3(e.getX(), e.getY()), ((CanvasPanel) e.getComponent()).image, true);
         }
 
-        private void line(Vector3 end, MyImage image, boolean temporary) {
+        private void circle(Vector3 end, MyImage image, boolean temporary) {
                 if (start != null) {
+                        int radius = (int) Vector3.getDistance(start, end);
+                        if (radius == 0) {
+                                return;
+                        }
+
                         image.clearShapes();
 
                         int colorA = ColorButton.getColor(ColorButton.PRIMARY).getRGB();
                         int colorB = ColorButton.getColor(ColorButton.SECONDARY).getRGB();
 
-                        Bresenham.drawLine(start, end, image, colorA, colorB);
+                        Bresenham.drawCircle(start, radius, image, colorA, colorB);
 
                         image.applyShapes(temporary);
                 }

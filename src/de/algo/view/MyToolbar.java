@@ -19,7 +19,7 @@
 
 package de.algo.view;
 
-import de.algo.view.tools.*;
+import de.algo.controller.tools.*;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
