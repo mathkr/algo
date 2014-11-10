@@ -44,7 +44,6 @@ public class CanvasPanel extends JPanel implements Observer {
 
                 image.addObserver(this);
 
-
                 addMouseMotionListener(new MouseAdapter() {
                         @Override
                         public void mouseDragged(MouseEvent e) {
@@ -141,11 +140,10 @@ public class CanvasPanel extends JPanel implements Observer {
                                 Graphics2D g2d = (Graphics2D) g;
                                 g2d.setColor(Color.WHITE);
                                 g2d.setXORMode(Color.BLACK);
-                                g2d.setStroke(new BasicStroke(2f));
 
                                 int w = 18;
-                                g.drawLine(pivot.x - w / 2, pivot.y, pivot.x + w / 2, pivot.y);
-                                g.drawLine(pivot.x, pivot.y - w / 2, pivot.x, pivot.y + w / 2);
+                                g.drawLine(pivot.x - 2 * w / 2, pivot.y, pivot.x + 2 * w / 2, pivot.y);
+                                g.drawLine(pivot.x, pivot.y - 2 * w / 2, pivot.x, pivot.y + 2 * w / 2);
                                 g.drawOval(pivot.x - w / 2, pivot.y - w / 2, w, w);
                         }
 

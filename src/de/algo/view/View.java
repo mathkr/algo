@@ -207,7 +207,7 @@ public class View implements Observer {
         }
 
         public static ImageIcon getIcon(String path) {
-                File file = new File("icons/black/png/" + path + ".png");
+                File file = new File("icons/used/" + path + ".png");
 
                 if (file.exists() && file.canRead()) {
                         return new ImageIcon(file.getPath());
@@ -225,7 +225,7 @@ public class View implements Observer {
                                                    int iWidth, int iHeight, int margin)
         {
                 double aspectRatio = (double) iWidth / (double) iHeight;
- width -= margin;
+                 width -= margin;
                 height -= margin;
 
                 int x, y, w, h;

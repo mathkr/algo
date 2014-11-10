@@ -32,7 +32,7 @@ public class Logger {
                 "DEBG"
         };
 
-        private static int maximumLogLevel = DEBUG;
+        private static int maximumLogLevel = INFO;
         private static boolean printPrefix = true;
 
         public static void setMaximumLogLevel(int level) {

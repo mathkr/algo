@@ -50,6 +50,8 @@ public class ThumbnailPanel extends JPanel {
 
                 setPreferredSize(new Dimension(size, size));
 
+                setToolTipText(image.IDENTIFIER);
+
                 addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
