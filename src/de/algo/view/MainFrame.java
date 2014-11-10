@@ -54,7 +54,19 @@ public class MainFrame extends JFrame {
                 TOOLBAR = new MyToolbar();
                 TOOLBAR.addChangeListener(e -> CANVASTABS.setCursor(TOOLBAR.getToolCursor()));
 
-                CANVASAREA.add(TOOLBAR, BorderLayout.WEST);
+                JScrollPane toolbarPane = new JScrollPane(TOOLBAR) {
+                        @Override
+                        public Dimension getPreferredSize() {
+                                return new Dimension(
+                                        TOOLBAR.getPreferredSize().width + this.getVerticalScrollBar().getWidth(),
+                                        TOOLBAR.getPreferredSize().height + this.getHorizontalScrollBarPolicy());
+                        }
+                };
+                toolbarPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                toolbarPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+                toolbarPane.setBorder(null);
+
+                CANVASAREA.add(toolbarPane, BorderLayout.WEST);
 
                 GALLERY = new ImageSelectorPanel(250, 1, 10, false);
                 GALLERYAREA = new GalleryPanel(GALLERY);
