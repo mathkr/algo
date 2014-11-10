@@ -53,9 +53,9 @@ public class SlideshowDialog extends JDialog {
                 setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
                 setUndecorated(true);
                 setPreferredSize(size);
-                setLocationRelativeTo(null);
 
                 pack();
+                setLocationRelativeTo(null);
                 toFront();
 
                 slideshowPanel.start();

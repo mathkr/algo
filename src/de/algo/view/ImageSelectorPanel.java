@@ -55,7 +55,7 @@ public class ImageSelectorPanel extends JPanel {
 
                 addMouseListener(new MouseAdapter() {
                         @Override
-                        public void mouseClicked(MouseEvent e) {
+                        public void mousePressed(MouseEvent e) {
                                 if (e.getComponent() instanceof ThumbnailPanel) {
                                         processClick((ThumbnailPanel) e.getComponent());
                                         repaint();

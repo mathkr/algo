@@ -168,8 +168,10 @@ public class View implements Observer {
                                         File file = new File(s);
                                         String title = file.getName();
 
+                                        int index = MAIN_FRAME.CANVASTABS.getTabCount();
+
                                         CanvasPanel canvas =
-                                                new CanvasPanel(model.loadedImages.get(s), MAIN_FRAME.TOOLBAR);
+                                                new CanvasPanel(model.loadedImages.get(s), MAIN_FRAME.TOOLBAR, index);
                                         openCanvasPanels.put(s, canvas);
 
                                         JScrollPane scrollPane = new JScrollPane();
@@ -179,6 +181,8 @@ public class View implements Observer {
 
                                         MAIN_FRAME.CANVASTABS.add(title, scrollPane);
                                         MAIN_FRAME.CANVASTABS.setSelectedComponent(scrollPane);
+                                } else {
+                                        MAIN_FRAME.CANVASTABS.setSelectedIndex(openCanvasPanels.get(s).index);
                                 }
                         });
                 });

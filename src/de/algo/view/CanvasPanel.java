@@ -42,8 +42,11 @@ public class CanvasPanel extends JPanel implements Observer {
 
         private int xTranslation, yTranslation;
 
-        public CanvasPanel(MyImage image, MyToolbar toolbar) {
+        public int index;
+
+        public CanvasPanel(MyImage image, MyToolbar toolbar, int index) {
                 this.image = image;
+                this.index = index;
 
                 float[] dash = { 5f, 5f };
                 setBackground(Color.DARK_GRAY);
