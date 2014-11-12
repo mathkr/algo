@@ -22,8 +22,36 @@ package de.algo.model;
 public class Matrix {
         private double[][] data;
 
+        private static final Matrix ISO;
+
+        static {
+                ISO = new Matrix();
+
+                ISO.data[0][0] = Math.sqrt(3) / Math.sqrt(6);
+                ISO.data[0][1] = 0;
+                ISO.data[0][2] = -ISO.data[0][0];
+
+                ISO.data[1][0] = 1 / Math.sqrt(6);
+                ISO.data[1][1] = 2 / Math.sqrt(6);
+                ISO.data[1][2] = 1 / Math.sqrt(6);
+
+                ISO.data[2][0] = Math.sqrt(2) / Math.sqrt(6);
+                ISO.data[2][1] = -ISO.data[2][0];
+                ISO.data[2][2] = ISO.data[2][0];
+        }
+
         public Matrix() {
                 data = new double[3][3];
+        }
+
+        public Matrix(Matrix m) {
+                this();
+
+                for (int i = 0; i < 3; ++i) {
+                        for (int j = 0; j < 3; ++j) {
+                                data[i][j] = m.data[i][j];
+                        }
+                }
         }
 
         public static Matrix getIdentityMatrix() {
@@ -34,6 +62,19 @@ public class Matrix {
                 res.data[2][2] = 1.0;
 
                 return res;
+        }
+
+        public static Matrix getOrthographicProjectionMatrix() {
+                Matrix res = new Matrix();
+
+                res.data[0][0] = 1.0;
+                res.data[1][1] = 1.0;
+
+                return res;
+        }
+
+        public static Matrix getIsometricRotationMatrix() {
+                return new Matrix(ISO);
         }
 
         public static Matrix getTranslationMatrix(int x, int y) {
@@ -74,6 +115,30 @@ public class Matrix {
                 res.data[1][0] = -res.data[0][1];
                 res.data[1][1] =  res.data[0][0];
                 res.data[2][2] =  1.0;
+
+                return res;
+        }
+
+        public static Matrix getYRotationMatrix(double angle) {
+                double rad = Math.toRadians(angle);
+
+                Matrix res = new Matrix();
+
+                res.data[0][0] =  Math.cos(rad);
+                res.data[0][2] =  Math.sin(rad);
+                res.data[1][1] =  1.0;
+                res.data[2][0] = -res.data[0][2];
+                res.data[2][2] =  res.data[0][0];
+
+                return res;
+        }
+
+        public static Matrix get3DScalingMatrix(double x, double y, double z) {
+                Matrix res = new Matrix();
+
+                res.data[0][0] = x;
+                res.data[1][1] = y;
+                res.data[2][2] = z;
 
                 return res;
         }

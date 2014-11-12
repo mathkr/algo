@@ -40,6 +40,7 @@ public class MainFrame extends JFrame {
 
         public final JMenu MENU_VIEW;
         public final JMenuItem MENUITEM_SLIDESHOW;
+        public final JMenuItem MENUITEM_CLUSTER;
 
         public MainFrame() {
                 super();
@@ -91,7 +92,9 @@ public class MainFrame extends JFrame {
 
                 MENU_VIEW = new JMenu("View");
                 MENUITEM_SLIDESHOW = new JMenuItem("Start slideshow..");
+                MENUITEM_CLUSTER = new JMenuItem("Show cluster visualization..");
                 MENU_VIEW.add(MENUITEM_SLIDESHOW);
+                MENU_VIEW.add(MENUITEM_CLUSTER);
 
                 MENUBAR.add(MENU_FILE);
                 MENUBAR.add(MENU_HISTO);

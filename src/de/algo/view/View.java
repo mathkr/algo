@@ -156,6 +156,57 @@ public class View implements Observer {
                         }
                 });
 
+                MAIN_FRAME.MENUITEM_CLUSTER.addActionListener(event -> {
+                        if (getSelectedCanvas() == null) {
+                                JOptionPane.showMessageDialog(MAIN_FRAME,
+                                        "No images have been opened for editing.");
+                        } else {
+                                int count = 16;
+
+                                JDialog countDialog = new JDialog(MAIN_FRAME, "Number of clusters", true);
+                                JPanel countPanel = new JPanel();
+                                countPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                                countDialog.add(countPanel);
+
+                                countPanel.setLayout(new BoxLayout(countPanel, BoxLayout.Y_AXIS));
+
+                                JLabel label = new JLabel("Put in the number of clusters to calculate:");
+                                countPanel.add(label);
+
+                                countPanel.add(Box.createVerticalStrut(10));
+
+                                JTextField input = new JTextField(Integer.toString(count));
+                                countPanel.add(input);
+
+                                countPanel.add(Box.createVerticalStrut(10));
+
+                                JButton confirm = new JButton("Confirm");
+                                countPanel.add(confirm);
+
+                                ActionListener confirmAction = e -> countDialog.setVisible(false);
+
+                                confirm.addActionListener(confirmAction);
+                                input.addActionListener(confirmAction);
+
+                                countDialog.pack();
+                                countDialog.setLocationRelativeTo(null);
+                                countDialog.setVisible(true);
+
+                                try {
+                                        count = Integer.decode(input.getText());
+                                } catch (NumberFormatException e) {
+                                        e.printStackTrace();
+                                }
+
+                                JDialog dialog = new JDialog(MAIN_FRAME, false);
+                                dialog.setLayout(new BorderLayout());
+                                dialog.add(new ClusteringTestPanel(getSelectedCanvas().image, count));
+                                dialog.pack();
+                                dialog.setLocationRelativeTo(null);
+                                dialog.setVisible(true);
+                        }
+                });
+
                 MAIN_FRAME.GALLERYAREA.ADD.addActionListener(event -> openFiles());
 
                 MAIN_FRAME.GALLERYAREA.EDIT.addActionListener(event -> {

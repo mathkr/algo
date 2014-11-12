@@ -86,4 +86,9 @@ public class Vector3 {
 
                 return false;
         }
+
+        @Override
+        public int hashCode() {
+                return (z & 0x3FF) << 22 | (y & 0x3FF) << 12 | x & 0xFFF;
+        }
 }
