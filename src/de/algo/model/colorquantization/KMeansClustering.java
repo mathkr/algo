@@ -1,6 +1,7 @@
 package de.algo.model.colorquantization;
 
 import de.algo.model.Vector3;
+import de.algo.util.Logger;
 
 import java.util.*;
 
@@ -11,8 +12,7 @@ public class KMeansClustering {
                  */
                 k = k < points.length ? k : points.length;
 
-                // DEBUG:
-                System.out.println("starting clustering with " + points.length + " points and " + k + " means..");
+                Logger.log(Logger.INFO, "Starting clustering with " + points.length + " points and " + k + " means..");
 
                 /*
                  * Initialize k clusters with random points from the point set.
@@ -34,8 +34,7 @@ public class KMeansClustering {
                         ++i;
                 }
 
-                // DEBUG:
-                System.out.println("finished approximating clusters after " + i + " iterations");
+                Logger.log(Logger.INFO, "Finished approximating clusters after " + i + " iterations");
 
                 return clusters;
         }

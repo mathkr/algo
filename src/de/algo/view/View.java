@@ -198,12 +198,18 @@ public class View implements Observer {
                                         e.printStackTrace();
                                 }
 
-                                JDialog dialog = new JDialog(MAIN_FRAME, false);
-                                dialog.setLayout(new BorderLayout());
-                                dialog.add(new ClusteringTestPanel(getSelectedCanvas().image, count));
-                                dialog.pack();
-                                dialog.setLocationRelativeTo(null);
-                                dialog.setVisible(true);
+                                JDialog visualizationDialog = new JDialog(MAIN_FRAME, false);
+                                visualizationDialog.setLayout(new BorderLayout());
+                                visualizationDialog.add(new ClusteringTestPanel(getSelectedCanvas().image, count));
+                                visualizationDialog.addWindowListener(new WindowAdapter() {
+                                        @Override
+                                        public void windowClosing(WindowEvent e) {
+                                                visualizationDialog.dispose();
+                                        }
+                                });
+                                visualizationDialog.pack();
+                                visualizationDialog.setLocationRelativeTo(null);
+                                visualizationDialog.setVisible(true);
                         }
                 });
 

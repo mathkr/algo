@@ -6,17 +6,18 @@ import de.algo.model.Vector3;
 import de.algo.model.colorquantization.KMeansClustering;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ClusteringTestPanel extends JPanel {
         private KMeansClustering.Cluster[] clusters;
 
         private Timer timer;
         private String loadingString;
+        private String infoString;
 
         private Matrix transformation;
         private Matrix projection;
@@ -28,7 +29,8 @@ public class ClusteringTestPanel extends JPanel {
                         Matrix.getIsometricRotationMatrix(), Matrix.get3DScalingMatrix(1.5, 1.5, 1.5));
                 this.projection = Matrix.getOrthographicProjectionMatrix();
 
-                loadingString = "Creating " + clusterCount + " clusters";
+                loadingString = "Creating clusters";
+                infoString = "clusters: " + clusterCount;
 
                 setBackground(Color.BLACK);
                 setForeground(Color.WHITE);
@@ -45,6 +47,8 @@ public class ClusteringTestPanel extends JPanel {
 
                                 uniques.add(new Vector3(r, g, b));
                         }
+
+                        infoString = infoString + ", unique colors: " + uniques.size();
 
                         Vector3[] colors = uniques.toArray(new Vector3[uniques.size()]);
                         clusters = KMeansClustering.generateCluster(colors, clusterCount);
@@ -98,7 +102,8 @@ public class ClusteringTestPanel extends JPanel {
 
                 if (clusters == null) {
                         g.setFont(g.getFont().deriveFont(18.0f));
-                        g.drawString(loadingString, 10, 100);
+                        g.drawString(infoString, 10, 100);
+                        g.drawString(loadingString, 10, 124);
                 } else {
                         g.translate(500, 200);
 
@@ -139,8 +144,8 @@ public class ClusteringTestPanel extends JPanel {
 
                 g.setColor(Color.WHITE);
 
-                g.drawString("r", x.x, x.y);
-                g.drawString("g", y.x, y.y);
-                g.drawString("b", z.x, z.y);
+                g.drawString("R", x.x, x.y);
+                g.drawString("G", y.x, y.y);
+                g.drawString("B", z.x, z.y);
         }
 }
