@@ -11,9 +11,3 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 mainClassName = "de.algo.Main"
-
-jar {
-        manifest {
-                attributes 'Main-Class': 'de.algo.Main'
-        }
-}
