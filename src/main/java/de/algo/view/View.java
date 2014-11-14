@@ -271,7 +271,7 @@ public class View implements Observer {
         }
 
         public static ImageIcon getIcon(String path) {
-                File file = new File("icons/used/" + path + ".png");
+                File file = new File("src/main/resources/icons/" + path + ".png");
 
                 if (file.exists() && file.canRead()) {
                         return new ImageIcon(file.getPath());
