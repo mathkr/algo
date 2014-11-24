@@ -150,22 +150,14 @@ public class Controller {
                 }
 
                 new Thread(() -> {
-                        Map<Integer, Integer> colors = new HashMap<>();
-
-                        for (int i = 0; i < image.transformedData.length; ++i) {
-                                int count = colors.getOrDefault(image.transformedData[i], 0);
-                                colors.put(image.transformedData[i], count + 1);
-                        }
-
-                        Map<Integer, Integer> sorted = new TreeMap<>((a, b) -> colors.get(b).compareTo(colors.get(a)));
-                        sorted.putAll(colors);
+                        List<MyImage.ColorEntry> sortedColors = image.getSortedColors();
 
                         StringBuilder sb = new StringBuilder();
 
-                        for (Map.Entry<Integer, Integer> entry : sorted.entrySet()) {
-                                sb.append(String.format("%-10X", entry.getKey()));
+                        for (MyImage.ColorEntry entry : sortedColors) {
+                                sb.append(String.format("%-10X", entry.color));
                                 sb.append(": ");
-                                sb.append(entry.getValue());
+                                sb.append(entry.count);
                                 sb.append(System.lineSeparator());
                         }
 

@@ -22,6 +22,7 @@ package de.algo.model;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
+import java.util.List;
 
 /**
  * Internal representation of an image on which linear transformations and drawing operations
@@ -74,6 +75,37 @@ public class MyImage extends Observable {
         private Selection selection;
         private Vector3 pivot;
 
+        /**
+         * Colors of the transformedImage and their number of occurences,
+         * sorted by their occurence count.
+         */
+        private List<ColorEntry> sortedColors;
+
+        /**
+         * Caches the last result of getMostFrequentColors(int n).
+         */
+        private int[] mostFrequentColorsCache;
+
+        /**
+         * The last n that was used as a parameter for getMostFrequentColors(int n).
+         */
+        private int lastMostFrequentN;
+
+        public static class ColorEntry implements Comparable<ColorEntry> {
+                public int color;
+                public int count;
+
+                public ColorEntry(int color, int count) {
+                        this.color = color;
+                        this.count = count;
+                }
+
+                @Override
+                public int compareTo(ColorEntry other) {
+                        return Integer.compare(other.count, count);
+                }
+        }
+
         public MyImage(String identifier, Image source) {
                 this.IDENTIFIER = identifier;
 
@@ -117,6 +149,52 @@ public class MyImage extends Observable {
                 createTransformedImage();
         }
 
+
+
+
+        public int[] getMostFrequentColors(int n) {
+                if (sortedColors == null) {
+                        /* Reset cache variables so they have to regenerate */
+                        mostFrequentColorsCache = null;
+                        lastMostFrequentN = 0;
+
+                        generateSortedColors();
+                }
+
+                if (lastMostFrequentN != n || mostFrequentColorsCache == null) {
+                        mostFrequentColorsCache = new int[n];
+                        lastMostFrequentN = n;
+
+                        for (int i = 0; i < n; ++i) {
+                                mostFrequentColorsCache[i] = sortedColors.get(i).color;
+                        }
+                }
+
+                return mostFrequentColorsCache;
+        }
+
+        private void generateSortedColors() {
+                /* Generate a map with colors and their occurence counts */
+                Map<Integer, Integer> colors = new HashMap<>();
+
+                for (int i = 0; i < modifiedData.length; ++i) {
+                        int count = colors.getOrDefault(modifiedData[i], 0);
+                        colors.put(modifiedData[i], count + 1);
+                }
+
+                sortedColors = new ArrayList<>(colors.size());
+                colors.forEach((col, n) -> sortedColors.add(new ColorEntry(col, n)));
+                sortedColors.sort(null);
+        }
+
+        public List<ColorEntry> getSortedColors() {
+                if (sortedColors == null) {
+                        generateSortedColors();
+                }
+
+                return sortedColors;
+        }
+
         /**
          * Resets all modifications to the modified image and resets the transformation matrices.
          */
@@ -127,6 +205,8 @@ public class MyImage extends Observable {
                 pastedImage = null;
                 pastedData = null;
                 pastedMatrix = Matrix.getIdentityMatrix();
+
+                sortedColors = null;
 
                 System.arraycopy(originalData, 0, modifiedData, 0, originalData.length);
 
@@ -143,6 +223,8 @@ public class MyImage extends Observable {
                 System.arraycopy(transformedData, 0, modifiedData, 0, transformedData.length);
                 transformationMatrix = Matrix.getIdentityMatrix();
                 inverseMatrix = Matrix.getIdentityMatrix();
+
+                sortedColors = null;
 
                 pastedImage = null;
                 pastedData = null;
