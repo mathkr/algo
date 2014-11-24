@@ -157,15 +157,15 @@ public class Controller {
                                 colors.put(image.transformedData[i], count + 1);
                         }
 
-                        Map<Integer, Integer> sorted = new TreeMap<>((a, b) -> colors.get(b).compareTo(colors.get(a)));
-                        sorted.putAll(colors);
+                        List<Integer> sorted = new ArrayList<>(colors.keySet());
+                        sorted.sort((a, b) -> colors.get(b).compareTo(colors.get(a)));
 
                         StringBuilder sb = new StringBuilder();
 
-                        for (Map.Entry<Integer, Integer> entry : sorted.entrySet()) {
-                                sb.append(String.format("%-10X", entry.getKey()));
+                        for (Integer color : sorted) {
+                                sb.append(String.format("%-10X", color));
                                 sb.append(": ");
-                                sb.append(entry.getValue());
+                                sb.append(colors.get(color));
                                 sb.append(System.lineSeparator());
                         }
 
