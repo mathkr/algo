@@ -22,6 +22,7 @@ package de.algo.view;
 import de.algo.controller.Controller;
 import de.algo.model.Model;
 import de.algo.model.MyImage;
+import de.algo.model.colorquantization.ColorQuantizer;
 import de.algo.util.Logger;
 
 import javax.swing.*;
@@ -141,7 +142,6 @@ public class View implements Observer {
                                         }
                                 }
                         }
-
                 });
 
                 MAIN_FRAME.MENUITEM_SLIDESHOW.addActionListener(event -> {
@@ -210,6 +210,62 @@ public class View implements Observer {
                                 visualizationDialog.pack();
                                 visualizationDialog.setLocationRelativeTo(null);
                                 visualizationDialog.setVisible(true);
+                        }
+                });
+
+                MAIN_FRAME.MENUITEM_QUANTIZE.addActionListener(event -> {
+                        if (getSelectedCanvas() == null) {
+                                JOptionPane.showMessageDialog(MAIN_FRAME,
+                                        "No images have been opened for editing.");
+                        } else {
+                                int percent = 50;
+
+                                JDialog quantizeDialog = new JDialog(MAIN_FRAME, "Color quantization", true);
+                                JPanel quantizePanel = new JPanel();
+                                quantizePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+                                quantizeDialog.add(quantizePanel);
+
+                                quantizePanel.setLayout(new BoxLayout(quantizePanel, BoxLayout.Y_AXIS));
+
+                                JLabel label = new JLabel("Put in the percentage of colors you want to keep:");
+                                quantizePanel.add(label);
+
+                                quantizePanel.add(Box.createVerticalStrut(10));
+
+                                //JTextField input = new JTextField(Float.toString(percent));
+                                JTextField input = new JTextField(Integer.toString(percent));
+                                quantizePanel.add(input);
+
+                                quantizePanel.add(Box.createVerticalStrut(10));
+
+                                JButton confirm = new JButton("Confirm");
+                                quantizePanel.add(confirm);
+
+                                ActionListener confirmAction = e -> quantizeDialog.setVisible(false);
+
+                                confirm.addActionListener(confirmAction);
+                                input.addActionListener(confirmAction);
+
+                                quantizeDialog.pack();
+                                quantizeDialog.setLocationRelativeTo(null);
+                                quantizeDialog.setVisible(true);
+
+                                try {
+                                        percent = Integer.decode(input.getText());
+                                        if (percent < 0  ) { //|| percent > 100.0f) {
+                                                InfoBar.publish("Error: invalid percentage. Input a number between 0 and 100!");
+                                                return;
+                                        } else {
+                                                // Quantize colors!
+                                                MyImage image = getSelectedCanvas().image;
+                                                // ColorQuantizer.quantizeColors(image, percent / 100.0f);
+                                                // ColorQuantizer.quantizeColors(image, percent);
+                                                ColorQuantizer.quantizeColorsWithClustering(image, 16);
+                                                image.refresh();
+                                        }
+                                } catch (NumberFormatException e) {
+                                        e.printStackTrace();
+                                }
                         }
                 });
 

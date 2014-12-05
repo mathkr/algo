@@ -460,6 +460,12 @@ public class MyImage extends Observable {
                 notifyObservers();
         }
 
+        public void refresh() {
+                createTransformedImage();
+                setChanged();
+                notifyObservers();
+        }
+
         /**
          * Notifies the MyImage that modifications to the shapesImage have been made.
          * If temporary is false, than the drawn shape is being applied to modifiedImage.
